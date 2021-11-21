@@ -215,280 +215,130 @@ pre code {
 
 
 <!-- rnb-text-begin -->
-<div id="calling-the-required-libraries" class="section level3">
-<h3>Calling the required libraries</h3>
+<div id="dirty-data---louise-shambrook" class="section level1">
+<h1>Dirty Data - Louise Shambrook</h1>
+<div id="section" class="section level2">
+<h2>26/11/2021</h2>
+<div id="required-libraries" class="section level3">
+<h3>- Required libraries</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShyZWFkcilcbmxpYnJhcnkocmVhZHhsKVxubGlicmFyeShkcGx5cilcbmxpYnJhcnkoaGVyZSlcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShyZWFkcilcbmxpYnJhcnkocmVhZHhsKVxubGlicmFyeShkcGx5cilcbmxpYnJhcnkoaGVyZSlcbiNjYWxsaW5nIGxpYnJhcmllc1xuYGBgIn0= -->
 <pre class="r"><code>library(readr)
 library(readxl)
 library(dplyr)
-library(here)</code></pre>
+library(here)
+#calling libraries</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="loading-the-datasets" class="section level3">
-<h3>Loading the datasets</h3>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2FuZHlfMjAxNSA8LSByZWFkX3hsc3goaGVyZTo6aGVyZShcImNhbmR5X3JhbmtpbmdfZGF0YS9ib2luZy1ib2luZy1jYW5keS0yMDE1Lnhsc3hcIikpXG5jYW5keV8yMDE2IDwtIHJlYWRfeGxzeChoZXJlOjpoZXJlKFwiY2FuZHlfcmFua2luZ19kYXRhL2JvaW5nLWJvaW5nLWNhbmR5LTIwMTYueGxzeFwiKSlcbmNhbmR5XzIwMTcgPC0gcmVhZF94bHN4KGhlcmU6OmhlcmUoXCJjYW5keV9yYW5raW5nX2RhdGEvYm9pbmctYm9pbmctY2FuZHktMjAxNy54bHN4XCIpKVxuYGBgIn0= -->
-<pre class="r"><code>candy_2015 &lt;- read_xlsx(here::here(&quot;candy_ranking_data/boing-boing-candy-2015.xlsx&quot;))
-candy_2016 &lt;- read_xlsx(here::here(&quot;candy_ranking_data/boing-boing-candy-2016.xlsx&quot;))
-candy_2017 &lt;- read_xlsx(here::here(&quot;candy_ranking_data/boing-boing-candy-2017.xlsx&quot;))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
 </div>
-<div id="completing-an-initial-exploration-of-the-data." class="section level3">
-<h3>Completing an initial exploration of the data.</h3>
+<div id="points-to-include-in-final-report" class="section level2">
+<h2>Points to include in final report:</h2>
+<ul>
+<li>A brief introduction to the dataset</li>
+<li>A list of any assumptions you have made</li>
+<li>The steps you took to clean the data (you don’t need to write out in detail every step, but a combination of commented code chunks with surrounding overall explanations would be great).</li>
+<li>The answers to the questions presented in the task brief</li>
+<li>Any other interesting analyses or conclusions you come across.</li>
+</ul>
+</div>
+</div>
+<div id="final-report-draft" class="section level1">
+<h1>Final report (draft)</h1>
+<div id="brief-introduction-to-the-dataset" class="section level3">
+<h3>Brief Introduction to the dataset</h3>
+<p>In 2006, David Ng and Ben Cohen began to rank candy based on their location in geological strata, for trick or treating purposes. This has developed over the years into a “not quite social science legit survey”. As of 2019, this has become a way of measuring “net feelies” when trick or treating, for a wide range of candies, which critically includes items such as hugs, glow sticks and bread.</p>
+<p>Source: <a href="https://boingboing.net/author/davidng2" class="uri">https://boingboing.net/author/davidng2</a></p>
+</div>
+<div id="brief-introductions-to-assumptions" class="section level3">
+<h3>Brief introductions to assumptions</h3>
+<ul>
+<li>I intially assumed the dataset was complete, i.e. that the columns were correct (should be there).</li>
+<li>As I began to dig in to it and opened it in excel, I learned that some of these could be dropped.</li>
+<li>I then over-corrected and tried to drop too many.</li>
+<li>I then began to research the background of the dataset, and found that only some of these would need to be dropped.</li>
+<li>I assume that many of the NA’s can be dropped/changed without causing many problems.</li>
+<li>I assume that respondents will generally only be from the US and Canada.</li>
+<li>I assume that age will only be given in whole numbers.</li>
+</ul>
+</div>
+<div id="steps-to-clean-the-data" class="section level3">
+<h3>Steps to clean the data</h3>
+<ul>
+<li>Changing names of columns</li>
+<li>Changing timestamp of 2015 and 2016</li>
+<li>Changing column type of age</li>
+</ul>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>What is the total number of candy ratings given across the three years. (Number of candy ratings, not the number of raters. Don’t count missing values)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmFtZXMoY2FuZHlfMjAxNSlcbm5hbWVzKGNhbmR5XzIwMTYpXG5uYW1lcyhjYW5keV8yMDE3KVxuXG5oZWFkKGNhbmR5XzIwMTUpXG5oZWFkKGNhbmR5XzIwMTYpXG5oZWFkKGNhbmR5XzIwMTcpXG5cbiMgQXQgdGhpcyBwb2ludCwgaXQgaXMgb2Ygbm90ZSB0aGF0IHRoZSBjb2x1bW4gbmFtZXMgYXJlIHBhcnRpY3VsYXJseSBtZXNzeSBhbmRcbiMgd2lsbCBuZWVkIGNsZWFuaW5nLlxuXG4jIEl0IGlzIG9mIG5vdGUgdGhhdCBpbiB0aGUgY291bnRyeSBjb2x1bW4sIGRhdGEgaXMgcXVpdGUgbWVzc3kuXG5cbiMgSXQgaXMgYWxzbyBvZiBub3RlIHRoYXQgaW4gdGhlIGFnZSBjb2x1bW4sIHRoaXMgaXMgZW50ZXJlZCBhcyBhIGNoYXJhY3Rlci5cblxuIyBJbiB0aGUgMjAxNSBhbmQgMjAxNyBkYXRhc2V0LCB0aGVyZSBpcyBhbiBcIm90aGVyXCIgcXVlc3Rpb24sIHdoZXJlIHRoZXJlIGFyZSBcbiMgY2FuZHkgcmVzcG9uc2VzLiBJdCBpcyBpbXBvcnRhbnQgdG8gY29uc2lkZXIgaG93IHRvIGNhcHR1cmUgdGhpcyBkYXRhLlxuXG5gYGAifQ== -->
-<pre class="r"><code>names(candy_2015)
-names(candy_2016)
-names(candy_2017)
-
-head(candy_2015)
-head(candy_2016)
-head(candy_2017)
-
-# At this point, it is of note that the column names are particularly messy and
-# will need cleaning.
-
-# It is of note that in the country column, data is quite messy.
-
-# It is also of note that in the age column, this is entered as a character.
-
-# In the 2015 and 2017 dataset, there is an &quot;other&quot; question, where there are 
-# candy responses. It is important to consider how to capture this data.
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ3JvdXBfYnlcbnN1bW1hcmlzZShhY3Jvc3MoY291bnQpKVxuYGBgIn0= -->
+<pre class="r"><code>group_by
+summarise(across(count))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>What was the average age of people who are going out trick or treating?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGdvaW5nX291dCA9IHllcylcbmdyb3VwX2J5KGFnZSlcbnN1bW1hcmlzZShtZWFuKGFnZSkpXG5gYGAifQ== -->
+<pre class="r"><code>filter(going_out = yes)
+group_by(age)
+summarise(mean(age))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>What was the average age of people who are not going trick or treating?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGdvaW5nX291dCA9IG5vKVxuZ3JvdXBfYnkoYWdlKVxuc3VtbWFyaXNlKG1lYW4oYWdlKSlcbmBgYCJ9 -->
+<pre class="r"><code>filter(going_out = no)
+group_by(age)
+summarise(mean(age))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>For each of joy, despair and meh, which candy bar received the most of these ratings?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>How many people rated Starburst as despair?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>For the next three questions, count despair as -1, joy as +1, and meh as 0. What was the most popular candy bar by this rating system for each gender in the dataset ?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGYpXG5ncm91cF9ieShhY3Jvc3MoYWxsKGpveSkpKVxuc3VtbWFyaXNlKHN1bShuKSlcblxuYGBgIn0= -->
+<pre class="r"><code>filter(f)
+group_by(across(all(joy)))
+summarise(sum(n))
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<pre><code>A brief introduction to the dataset
-A list of any assumptions you have made
-The steps you took to clean the data (you don’t need to write out in detail every step, but a combination of commented code chunks with surrounding overall explanations would be great).
-The answers to the questions presented in the task brief
-Any other interesting analyses or conclusions you come across.</code></pre>
+<p>What was the most popular candy bar in each year?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xlYW5fY2FuZHlfMjAxNSA8LSBjYW5keV8yMDE1ICU+JSBcbiAgc2VsZWN0KC1jKDE2LCAxOCwgMjMsIDI2LCAyNywgMjgsIDMzLCAzOCwgNDEsIDQ1LCA1NiwgNTcsIDg1Ojk0LCA4OCwgOTMsIDk0LCAxMTA6MTE0LCAxMTY6MTI0KSlcbmNsZWFuX2NhbmR5XzIwMTVcbiMgcmVtb3ZpbmcgdGhlIG5hbWVzIHdoaWNoIGFyZSBjbGVhci1jdXRcblxubmFtZXMoY2xlYW5fY2FuZHlfMjAxNSlcblxuY2xlYW5fY2FuZHlfMjAxNSA8LSBjbGVhbl9jYW5keV8yMDE1ICU+JSBcbiAgc2VsZWN0KC1jKCkpXG5jbGVhbl9jYW5keV8yMDE1XG5cbjYsIDcsIDEyLCAxNiwgXG5gYGAifQ== -->
-<pre class="r"><code>clean_candy_2015 &lt;- candy_2015 %&gt;% 
-  select(-c(16, 18, 23, 26, 27, 28, 33, 38, 41, 45, 56, 57, 85:94, 88, 93, 94, 110:114, 116:124))
-clean_candy_2015
-# removing the names which are clear-cut
-
-names(clean_candy_2015)
-
-clean_candy_2015 &lt;- clean_candy_2015 %&gt;% 
-  select(-c())
-clean_candy_2015
-
-6, 7, 12, 16, </code></pre>
-<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>What was the most popular candy bar by this rating for people in US, Canada, UK, and all other countries?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjbGVhbiBlYWNoIGRhdGFzZXQgc2VwZWFyYXRlbHlcbiMgLS0tXG4jIDIwMTVcbiMgXG4jIFN0ZXAgMS4gRHJvcCBjb2x1bW5zLlxuIyAxMT9cbiMgICAxNlxuIyAxOFxuIyAyM1xuIyAyNlxuIyAyN1xuIyAyOFxuIyAzM1xuIyAzND9cbiMgICAzOFxuIyA0MVxuIyA0NVxuIyA1NlxuIyA1N1xuIyA2OT9cbiMgODhcbiMgOTNcbiMgOTRcbiMgMTAwLTExNFxuIyAxMTYtMTI0XG4jIFxuIyBTZWNvbmQgcmV2aWV3OlxuIyBmaWx0ZXIgb3V0IGNvbHVtbnMgd2hpY2ggdXNlZCB0byBiZSBrbm93bi8gYXNzb2NpYXRlZCB3aXRoIHN3ZWV0cy9ldGMsIG9yIHdoaWNoXG4jIGFyZSBib3JkZXJsaW5lL2dlbmVyaWMgY2FzZXMsIGUuZy5cbiMgMTkgLSBmcmVlIGNhbmR5IGdpdmVuIG91dCBhdCByZXN0YXVyYW50c1xuIyBcbiMgU3RlcCAyLiBDbGVhbiBjb2x1bW4gbmFtZXMgdXNpbmcgdGlkeXIgLyBjbGVhbnIuXG4jIFxuIyBTdGVwIDMuIENoYW5nZSBjb2x1bW4gbmFtZXMgdG8gcmVtb3ZlIHRoZSBbXS5cbiMgXG4jIFN0ZXAgNC4gQ2hhbmdlIGNvbHVtbiBuYW1lcyB0byBjb25maXJtIHRvIGJlc3QgcHJhY3RpY2UsIGUuZy4gXCJob3cgb2xkIGFyZSB5b3VcIlxuIyB3aWxsIGJlY29tZSBcImFnZVwiLlxuIyBcbiMgU3RlcCA1LiBDaGFuZ2UgdGltZXN0YW1wIHRvIHllYXIgLSAyMDE1LlxuIyBcbiMgU3RlcCA2LiBDbGVhbiBhZ2UgY29sdW1uIHRvIGNoYW5nZSBzdHJpbmcgYW5zd2VycyB0byBOQS5cbiMgXG4jIFN0ZXAgNy4gQ2hhbmdlIGFnZSBjb2x1bW4gdHlwZSB0byBudW1lcmljLlxuIyBcblxuYGBgIn0= -->
-<pre class="r"><code># clean each dataset sepearately
-# ---
-# 2015
-# 
-# Step 1. Drop columns.
-# 11?
-#   16
-# 18
-# 23
-# 26
-# 27
-# 28
-# 33
-# 34?
-#   38
-# 41
-# 45
-# 56
-# 57
-# 69?
-# 88
-# 93
-# 94
-# 100-114
-# 116-124
-# 
-# Second review:
-# filter out columns which used to be known/ associated with sweets/etc, or which
-# are borderline/generic cases, e.g.
-# 19 - free candy given out at restaurants
-# 
-# Step 2. Clean column names using tidyr / cleanr.
-# 
-# Step 3. Change column names to remove the [].
-# 
-# Step 4. Change column names to confirm to best practice, e.g. &quot;how old are you&quot;
-# will become &quot;age&quot;.
-# 
-# Step 5. Change timestamp to year - 2015.
-# 
-# Step 6. Clean age column to change string answers to NA.
-# 
-# Step 7. Change age column type to numeric.
-# 
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyAyMDE2XG4jIFxuIyBTdGVwIDEuIERyb3AgY29sdW1ucy5cbiMgMTJcbiMgMTNcbiMgMTVcbiMgMjFcbiMgMjJcbiMgMjZcbiMgMjdcbiMgMzFcbiMgMzJcbiMgMzggPyAoaGVhbHRoeSBmcnVpdClcbiMgNDNcbiMgNDZcbiMgNDggP1xuIyAgIDQ5XG4jIDY5XG4jIDc5XG4jIDEwMVxuIyAxMDJcbiMgMTA0XG4jIDEwNVxuIyAxMDktMTIzXG4jIFxuIyBTZWNvbmQgcmV2aWV3OlxuIyAgIGZpbHRlciBvdXQgY29sdW1ucyB3aGljaCB1c2VkIHRvIGJlIGtub3duLyBhc3NvY2lhdGVkIHdpdGggc3dlZXRzL2V0Yywgb3Igd2hpY2hcbiMgYXJlIGJvcmRlcmxpbmUvZ2VuZXJpYyBjYXNlcywgZS5nLlxuIyAxOSAtIGZyZWUgY2FuZHkgZ2l2ZW4gb3V0IGF0IHJlc3RhdXJhbnRzXG4jIFxuIyBTdGVwIDIuIENsZWFuIGNvbHVtbiBuYW1lcyB1c2luZyB0aWR5ciAvIGNsZWFuci5cbiMgXG4jIFN0ZXAgMy4gQ2hhbmdlIGNvbHVtbiBuYW1lcyB0byByZW1vdmUgdGhlIFtdLlxuIyBcbiMgU3RlcCA0LiBDaGFuZ2UgY29sdW1uIG5hbWVzIHRvIGNvbmZpcm0gdG8gYmVzdCBwcmFjdGljZSwgZS5nLiBcImhvdyBvbGQgYXJlIHlvdVwiXG4jIHdpbGwgYmVjb21lIFwiYWdlXCIuXG4jIFxuIyBTdGVwIDUuIENoYW5nZSB0aW1lc3RhbXAgdG8geWVhciAtIDIwMTUuXG4jIFxuIyBTdGVwIDYuIENsZWFuIGFnZSBjb2x1bW4gdG8gY2hhbmdlIHN0cmluZyBhbnN3ZXJzIHRvIE5BLlxuIyBcbiMgU3RlcCA3LiBDaGFuZ2UgYWdlIGNvbHVtbiB0eXBlIHRvIG51bWVyaWMuXG4jIFxuIyBTdGVwIDguIENsZWFuIGNvdW50cnkgbmFtZXM7IGVuc3VyZSBhbGwgY291bnRyaWVzIGFyZSBjYXBpdGFsaXNlZC5cbiMgXG4jIFN0ZXAgOS4gQ2hhbmdlIGFsbCB2ZXJzaW9ucyBvZiBVU0EgdG8gVVNBLCBhbmQgc2ltaWxhciBmb3Igb3RoZXIgY291bnRyaWVzLlxuIyBcbiMgU3RlcCAxMC4gUmVtb3ZlIGluY29ycmVjdCBzdHJpbmdzLiBcbiMgXG4jIFN0ZXAgMTEuIENsZWFuIHN0YXRlIGNvbHVtbiwgaS5lLiBlbnN1cmUgYWxsIHN0cmluZ3MgYXJlIGNvcnJlY3QuXG4jIFxuIyBTdGVwIDEyLiBDaGFuZ2UgYWxsIFVTQSBhbmQgY2FuYWRpYW4gc3RhdGVzIHRvIHNhbWUgZm9ybWF0LCBlLmcuIFROLCBVU0FcbiMgXG5gYGAifQ== -->
-<pre class="r"><code># 2016
-# 
-# Step 1. Drop columns.
-# 12
-# 13
-# 15
-# 21
-# 22
-# 26
-# 27
-# 31
-# 32
-# 38 ? (healthy fruit)
-# 43
-# 46
-# 48 ?
-#   49
-# 69
-# 79
-# 101
-# 102
-# 104
-# 105
-# 109-123
-# 
-# Second review:
-#   filter out columns which used to be known/ associated with sweets/etc, or which
-# are borderline/generic cases, e.g.
-# 19 - free candy given out at restaurants
-# 
-# Step 2. Clean column names using tidyr / cleanr.
-# 
-# Step 3. Change column names to remove the [].
-# 
-# Step 4. Change column names to confirm to best practice, e.g. &quot;how old are you&quot;
-# will become &quot;age&quot;.
-# 
-# Step 5. Change timestamp to year - 2015.
-# 
-# Step 6. Clean age column to change string answers to NA.
-# 
-# Step 7. Change age column type to numeric.
-# 
-# Step 8. Clean country names; ensure all countries are capitalised.
-# 
-# Step 9. Change all versions of USA to USA, and similar for other countries.
-# 
-# Step 10. Remove incorrect strings. 
-# 
-# Step 11. Clean state column, i.e. ensure all strings are correct.
-# 
-# Step 12. Change all USA and canadian states to same format, e.g. TN, USA
-# </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyAyMDE3XG4jIFxuIyBTdGVwIDEuIERyb3AgY29sdW1ucy5cbiMgMTJcbiMgMTVcbiMgMjFcbiMgMjZcbiMgMzFcbiMgMzJcbiMgMzg/XG4jICAgNDNcbiMgNDZcbiMgNDg/XG4jIDQ5XG4jIDY4XG4jIDY5XG4jIDcwXG4jIDgxXG4jIDg2XG4jIDEwNFxuIyAxMDVcbiMgMTA3XG4jIDExMi0xMjBcbiMgXG4jIFNlY29uZCByZXZpZXc6XG4jICAgZmlsdGVyIG91dCBjb2x1bW5zIHdoaWNoIHVzZWQgdG8gYmUga25vd24vIGFzc29jaWF0ZWQgd2l0aCBzd2VldHMvZXRjLCBvciB3aGljaFxuIyBhcmUgYm9yZGVybGluZS9nZW5lcmljIGNhc2VzLCBlLmcuXG4jIDE5IC0gZnJlZSBjYW5keSBnaXZlbiBvdXQgYXQgcmVzdGF1cmFudHNcbiMgXG4jIFN0ZXAgMi4gQ2xlYW4gY29sdW1uIG5hbWVzIHVzaW5nIHRpZHlyIC8gY2xlYW5yLlxuIyBcbiMgU3RlcCAzLiBDaGFuZ2UgY29sdW1uIG5hbWVzIHRvIHJlbW92ZSB0aGUgW10uXG4jIFxuIyBTdGVwIDQuIENoYW5nZSBjb2x1bW4gbmFtZXMgdG8gY29uZmlybSB0byBiZXN0IHByYWN0aWNlLCBlLmcuIFwiaG93IG9sZCBhcmUgeW91XCJcbiMgd2lsbCBiZWNvbWUgXCJhZ2VcIi5cbiMgXG4jIFN0ZXAgNS4gQ2hhbmdlIHRpbWVzdGFtcCB0byB5ZWFyIC0gMjAxNS5cbiMgXG4jIFN0ZXAgNi4gQ2xlYW4gYWdlIGNvbHVtbiB0byBjaGFuZ2Ugc3RyaW5nIGFuc3dlcnMgdG8gTkEuXG4jIFxuIyBTdGVwIDcuIENoYW5nZSBhZ2UgY29sdW1uIHR5cGUgdG8gbnVtZXJpYy5cbiMgXG4jIFN0ZXAgOC4gQ2xlYW4gY291bnRyeSBuYW1lczsgZW5zdXJlIGFsbCBjb3VudHJpZXMgYXJlIGNhcGl0YWxpc2VkLlxuIyBcbiMgU3RlcCA5LiBDaGFuZ2UgYWxsIHZlcnNpb25zIG9mIFVTQSB0byBVU0EsIGFuZCBzaW1pbGFyIGZvciBvdGhlciBjb3VudHJpZXMuXG4jIFxuIyBTdGVwIDEwLiBSZW1vdmUgaW5jb3JyZWN0IHN0cmluZ3MuIFxuIyBcbiMgU3RlcCAxMS4gQ2xlYW4gc3RhdGUgY29sdW1uLCBpLmUuIGVuc3VyZSBhbGwgc3RyaW5ncyBhcmUgY29ycmVjdC5cbiMgXG4jIFN0ZXAgMTIuIENoYW5nZSBhbGwgVVNBIGFuZCBjYW5hZGlhbiBzdGF0ZXMgdG8gc2FtZSBmb3JtYXQsIGUuZy4gVE4sIFVTQVxuIyBcbmBgYCJ9 -->
-<pre class="r"><code># 2017
-# 
-# Step 1. Drop columns.
-# 12
-# 15
-# 21
-# 26
-# 31
-# 32
-# 38?
-#   43
-# 46
-# 48?
-# 49
-# 68
-# 69
-# 70
-# 81
-# 86
-# 104
-# 105
-# 107
-# 112-120
-# 
-# Second review:
-#   filter out columns which used to be known/ associated with sweets/etc, or which
-# are borderline/generic cases, e.g.
-# 19 - free candy given out at restaurants
-# 
-# Step 2. Clean column names using tidyr / cleanr.
-# 
-# Step 3. Change column names to remove the [].
-# 
-# Step 4. Change column names to confirm to best practice, e.g. &quot;how old are you&quot;
-# will become &quot;age&quot;.
-# 
-# Step 5. Change timestamp to year - 2015.
-# 
-# Step 6. Clean age column to change string answers to NA.
-# 
-# Step 7. Change age column type to numeric.
-# 
-# Step 8. Clean country names; ensure all countries are capitalised.
-# 
-# Step 9. Change all versions of USA to USA, and similar for other countries.
-# 
-# Step 10. Remove incorrect strings. 
-# 
-# Step 11. Clean state column, i.e. ensure all strings are correct.
-# 
-# Step 12. Change all USA and canadian states to same format, e.g. TN, USA
-# </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBKb2luaW5nIGRhdGFzZXRzIHRvZ2V0aGVyXG4jIFBpdm90IGVhY2ggdGFibGUgdG8gaGF2ZSB5ZWFyIGluIGEgY29sdW1uIGhlYWRpbmcsIGFuZCB0aGUgaW5kaXZpZHVhbCB2YWx1ZXMgaW4gcm93cy5cbiMgRnJvbSB0aGVyZSB0aGVuIGpvaW4gdGhlbT9cblxuYGBgIn0= -->
-<pre class="r"><code># Joining datasets together
-# Pivot each table to have year in a column heading, and the individual values in rows.
-# From there then join them?
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5cbiMgQW5hbHlzaXMgcXVlc3Rpb25zOlxuIyBXaGF0IGlzIHRoZSB0b3RhbCBudW1iZXIgb2YgY2FuZHkgcmF0aW5ncyBnaXZlbiBhY3Jvc3MgdGhlIHRocmVlIHllYXJzLiAoTnVtYmVyIG9mIGNhbmR5IHJhdGluZ3MsIG5vdCB0aGUgbnVtYmVyIG9mIHJhdGVycy4gRG9u4oCZdCBjb3VudCBtaXNzaW5nIHZhbHVlcylcbiMgV2hhdCB3YXMgdGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZz9cbiMgV2hhdCB3YXMgdGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIG5vdCBnb2luZyB0cmljayBvciB0cmVhdGluZz9cbiMgRm9yIGVhY2ggb2Ygam95LCBkZXNwYWlyIGFuZCBtZWgsIHdoaWNoIGNhbmR5IGJhciByZXZpdmVkIHRoZSBtb3N0IG9mIHRoZXNlIHJhdGluZ3M/XG4jIEhvdyBtYW55IHBlb3BsZSByYXRlZCBTdGFyYnVyc3QgYXMgZGVzcGFpcj9cbiMgXG4jIEZvciB0aGUgbmV4dCB0aHJlZSBxdWVzdGlvbnMsIGNvdW50IGRlc3BhaXIgYXMgLTEsIGpveSBhcyArMSwgYW5kIG1laCBhcyAwLlxuIyBcbiMgV2hhdCB3YXMgdGhlIG1vc3QgcG9wdWxhciBjYW5keSBiYXIgYnkgdGhpcyByYXRpbmcgc3lzdGVtIGZvciBlYWNoIGdlbmRlciBpbiB0aGUgZGF0YXNldCA/XG4jIFdoYXQgd2FzIHRoZSBtb3N0IHBvcHVsYXIgY2FuZHkgYmFyIGluIGVhY2ggeWVhcj9cbiMgV2hhdCB3YXMgdGhlIG1vc3QgcG9wdWxhciBjYW5keSBiYXIgYnkgdGhpcyByYXRpbmcgZm9yIHBlb3BsZSBpbiBVUywgQ2FuYWRhLCBVSywgYW5kIGFsbCBvdGhlciBjb3VudHJpZXM/XG5gYGAifQ== -->
-<pre class="r"><code>
-
-# Analysis questions:
-# What is the total number of candy ratings given across the three years. (Number of candy ratings, not the number of raters. Don’t count missing values)
-# What was the average age of people who are going out trick or treating?
-# What was the average age of people who are not going trick or treating?
-# For each of joy, despair and meh, which candy bar revived the most of these ratings?
-# How many people rated Starburst as despair?
-# 
-# For the next three questions, count despair as -1, joy as +1, and meh as 0.
-# 
-# What was the most popular candy bar by this rating system for each gender in the dataset ?
-# What was the most popular candy bar in each year?
-# What was the most popular candy bar by this rating for people in US, Canada, UK, and all other countries?</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
+</div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyMjIENhbGxpbmcgdGhlIHJlcXVpcmVkIGxpYnJhcmllcwpgYGB7cn0KbGlicmFyeShyZWFkcikKbGlicmFyeShyZWFkeGwpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkoaGVyZSkKYGBgCgojIyMgTG9hZGluZyB0aGUgZGF0YXNldHMKYGBge3J9CmNhbmR5XzIwMTUgPC0gcmVhZF94bHN4KGhlcmU6OmhlcmUoImNhbmR5X3JhbmtpbmdfZGF0YS9ib2luZy1ib2luZy1jYW5keS0yMDE1Lnhsc3giKSkKY2FuZHlfMjAxNiA8LSByZWFkX3hsc3goaGVyZTo6aGVyZSgiY2FuZHlfcmFua2luZ19kYXRhL2JvaW5nLWJvaW5nLWNhbmR5LTIwMTYueGxzeCIpKQpjYW5keV8yMDE3IDwtIHJlYWRfeGxzeChoZXJlOjpoZXJlKCJjYW5keV9yYW5raW5nX2RhdGEvYm9pbmctYm9pbmctY2FuZHktMjAxNy54bHN4IikpCmBgYAoKIyMjIENvbXBsZXRpbmcgYW4gaW5pdGlhbCBleHBsb3JhdGlvbiBvZiB0aGUgZGF0YS4KYGBge3J9Cm5hbWVzKGNhbmR5XzIwMTUpCm5hbWVzKGNhbmR5XzIwMTYpCm5hbWVzKGNhbmR5XzIwMTcpCgpoZWFkKGNhbmR5XzIwMTUpCmhlYWQoY2FuZHlfMjAxNikKaGVhZChjYW5keV8yMDE3KQoKIyBBdCB0aGlzIHBvaW50LCBpdCBpcyBvZiBub3RlIHRoYXQgdGhlIGNvbHVtbiBuYW1lcyBhcmUgcGFydGljdWxhcmx5IG1lc3N5IGFuZAojIHdpbGwgbmVlZCBjbGVhbmluZy4KCiMgSXQgaXMgb2Ygbm90ZSB0aGF0IGluIHRoZSBjb3VudHJ5IGNvbHVtbiwgZGF0YSBpcyBxdWl0ZSBtZXNzeS4KCiMgSXQgaXMgYWxzbyBvZiBub3RlIHRoYXQgaW4gdGhlIGFnZSBjb2x1bW4sIHRoaXMgaXMgZW50ZXJlZCBhcyBhIGNoYXJhY3Rlci4KCiMgSW4gdGhlIDIwMTUgYW5kIDIwMTcgZGF0YXNldCwgdGhlcmUgaXMgYW4gIm90aGVyIiBxdWVzdGlvbiwgd2hlcmUgdGhlcmUgYXJlIAojIGNhbmR5IHJlc3BvbnNlcy4gSXQgaXMgaW1wb3J0YW50IHRvIGNvbnNpZGVyIGhvdyB0byBjYXB0dXJlIHRoaXMgZGF0YS4KCmBgYAoKCiAgICBBIGJyaWVmIGludHJvZHVjdGlvbiB0byB0aGUgZGF0YXNldAogICAgQSBsaXN0IG9mIGFueSBhc3N1bXB0aW9ucyB5b3UgaGF2ZSBtYWRlCiAgICBUaGUgc3RlcHMgeW91IHRvb2sgdG8gY2xlYW4gdGhlIGRhdGEgKHlvdSBkb27igJl0IG5lZWQgdG8gd3JpdGUgb3V0IGluIGRldGFpbCBldmVyeSBzdGVwLCBidXQgYSBjb21iaW5hdGlvbiBvZiBjb21tZW50ZWQgY29kZSBjaHVua3Mgd2l0aCBzdXJyb3VuZGluZyBvdmVyYWxsIGV4cGxhbmF0aW9ucyB3b3VsZCBiZSBncmVhdCkuCiAgICBUaGUgYW5zd2VycyB0byB0aGUgcXVlc3Rpb25zIHByZXNlbnRlZCBpbiB0aGUgdGFzayBicmllZgogICAgQW55IG90aGVyIGludGVyZXN0aW5nIGFuYWx5c2VzIG9yIGNvbmNsdXNpb25zIHlvdSBjb21lIGFjcm9zcy4KCgpgYGB7cn0KY2xlYW5fY2FuZHlfMjAxNSA8LSBjYW5keV8yMDE1ICU+JSAKICBzZWxlY3QoLWMoMTYsIDE4LCAyMywgMjYsIDI3LCAyOCwgMzMsIDM4LCA0MSwgNDUsIDU2LCA1NywgODU6OTQsIDg4LCA5MywgOTQsIDExMDoxMTQsIDExNjoxMjQpKQpjbGVhbl9jYW5keV8yMDE1CiMgcmVtb3ZpbmcgdGhlIG5hbWVzIHdoaWNoIGFyZSBjbGVhci1jdXQKCm5hbWVzKGNsZWFuX2NhbmR5XzIwMTUpCgpjbGVhbl9jYW5keV8yMDE1IDwtIGNsZWFuX2NhbmR5XzIwMTUgJT4lIAogIHNlbGVjdCgtYygpKQpjbGVhbl9jYW5keV8yMDE1Cgo2LCA3LCAxMiwgMTYsIApgYGAKCgpgYGB7cn0KIyBjbGVhbiBlYWNoIGRhdGFzZXQgc2VwZWFyYXRlbHkKIyAtLS0KIyAyMDE1CiMgCiMgU3RlcCAxLiBEcm9wIGNvbHVtbnMuCiMgMTE/CiMgICAxNgojIDE4CiMgMjMKIyAyNgojIDI3CiMgMjgKIyAzMwojIDM0PwojICAgMzgKIyA0MQojIDQ1CiMgNTYKIyA1NwojIDY5PwojIDg4CiMgOTMKIyA5NAojIDEwMC0xMTQKIyAxMTYtMTI0CiMgCiMgU2Vjb25kIHJldmlldzoKIyBmaWx0ZXIgb3V0IGNvbHVtbnMgd2hpY2ggdXNlZCB0byBiZSBrbm93bi8gYXNzb2NpYXRlZCB3aXRoIHN3ZWV0cy9ldGMsIG9yIHdoaWNoCiMgYXJlIGJvcmRlcmxpbmUvZ2VuZXJpYyBjYXNlcywgZS5nLgojIDE5IC0gZnJlZSBjYW5keSBnaXZlbiBvdXQgYXQgcmVzdGF1cmFudHMKIyAKIyBTdGVwIDIuIENsZWFuIGNvbHVtbiBuYW1lcyB1c2luZyB0aWR5ciAvIGNsZWFuci4KIyAKIyBTdGVwIDMuIENoYW5nZSBjb2x1bW4gbmFtZXMgdG8gcmVtb3ZlIHRoZSBbXS4KIyAKIyBTdGVwIDQuIENoYW5nZSBjb2x1bW4gbmFtZXMgdG8gY29uZmlybSB0byBiZXN0IHByYWN0aWNlLCBlLmcuICJob3cgb2xkIGFyZSB5b3UiCiMgd2lsbCBiZWNvbWUgImFnZSIuCiMgCiMgU3RlcCA1LiBDaGFuZ2UgdGltZXN0YW1wIHRvIHllYXIgLSAyMDE1LgojIAojIFN0ZXAgNi4gQ2xlYW4gYWdlIGNvbHVtbiB0byBjaGFuZ2Ugc3RyaW5nIGFuc3dlcnMgdG8gTkEuCiMgCiMgU3RlcCA3LiBDaGFuZ2UgYWdlIGNvbHVtbiB0eXBlIHRvIG51bWVyaWMuCiMgCgpgYGAKCgpgYGB7cn0KIyAyMDE2CiMgCiMgU3RlcCAxLiBEcm9wIGNvbHVtbnMuCiMgMTIKIyAxMwojIDE1CiMgMjEKIyAyMgojIDI2CiMgMjcKIyAzMQojIDMyCiMgMzggPyAoaGVhbHRoeSBmcnVpdCkKIyA0MwojIDQ2CiMgNDggPwojICAgNDkKIyA2OQojIDc5CiMgMTAxCiMgMTAyCiMgMTA0CiMgMTA1CiMgMTA5LTEyMwojIAojIFNlY29uZCByZXZpZXc6CiMgICBmaWx0ZXIgb3V0IGNvbHVtbnMgd2hpY2ggdXNlZCB0byBiZSBrbm93bi8gYXNzb2NpYXRlZCB3aXRoIHN3ZWV0cy9ldGMsIG9yIHdoaWNoCiMgYXJlIGJvcmRlcmxpbmUvZ2VuZXJpYyBjYXNlcywgZS5nLgojIDE5IC0gZnJlZSBjYW5keSBnaXZlbiBvdXQgYXQgcmVzdGF1cmFudHMKIyAKIyBTdGVwIDIuIENsZWFuIGNvbHVtbiBuYW1lcyB1c2luZyB0aWR5ciAvIGNsZWFuci4KIyAKIyBTdGVwIDMuIENoYW5nZSBjb2x1bW4gbmFtZXMgdG8gcmVtb3ZlIHRoZSBbXS4KIyAKIyBTdGVwIDQuIENoYW5nZSBjb2x1bW4gbmFtZXMgdG8gY29uZmlybSB0byBiZXN0IHByYWN0aWNlLCBlLmcuICJob3cgb2xkIGFyZSB5b3UiCiMgd2lsbCBiZWNvbWUgImFnZSIuCiMgCiMgU3RlcCA1LiBDaGFuZ2UgdGltZXN0YW1wIHRvIHllYXIgLSAyMDE1LgojIAojIFN0ZXAgNi4gQ2xlYW4gYWdlIGNvbHVtbiB0byBjaGFuZ2Ugc3RyaW5nIGFuc3dlcnMgdG8gTkEuCiMgCiMgU3RlcCA3LiBDaGFuZ2UgYWdlIGNvbHVtbiB0eXBlIHRvIG51bWVyaWMuCiMgCiMgU3RlcCA4LiBDbGVhbiBjb3VudHJ5IG5hbWVzOyBlbnN1cmUgYWxsIGNvdW50cmllcyBhcmUgY2FwaXRhbGlzZWQuCiMgCiMgU3RlcCA5LiBDaGFuZ2UgYWxsIHZlcnNpb25zIG9mIFVTQSB0byBVU0EsIGFuZCBzaW1pbGFyIGZvciBvdGhlciBjb3VudHJpZXMuCiMgCiMgU3RlcCAxMC4gUmVtb3ZlIGluY29ycmVjdCBzdHJpbmdzLiAKIyAKIyBTdGVwIDExLiBDbGVhbiBzdGF0ZSBjb2x1bW4sIGkuZS4gZW5zdXJlIGFsbCBzdHJpbmdzIGFyZSBjb3JyZWN0LgojIAojIFN0ZXAgMTIuIENoYW5nZSBhbGwgVVNBIGFuZCBjYW5hZGlhbiBzdGF0ZXMgdG8gc2FtZSBmb3JtYXQsIGUuZy4gVE4sIFVTQQojIApgYGAKCgoKYGBge3J9CiMgMjAxNwojIAojIFN0ZXAgMS4gRHJvcCBjb2x1bW5zLgojIDEyCiMgMTUKIyAyMQojIDI2CiMgMzEKIyAzMgojIDM4PwojICAgNDMKIyA0NgojIDQ4PwojIDQ5CiMgNjgKIyA2OQojIDcwCiMgODEKIyA4NgojIDEwNAojIDEwNQojIDEwNwojIDExMi0xMjAKIyAKIyBTZWNvbmQgcmV2aWV3OgojICAgZmlsdGVyIG91dCBjb2x1bW5zIHdoaWNoIHVzZWQgdG8gYmUga25vd24vIGFzc29jaWF0ZWQgd2l0aCBzd2VldHMvZXRjLCBvciB3aGljaAojIGFyZSBib3JkZXJsaW5lL2dlbmVyaWMgY2FzZXMsIGUuZy4KIyAxOSAtIGZyZWUgY2FuZHkgZ2l2ZW4gb3V0IGF0IHJlc3RhdXJhbnRzCiMgCiMgU3RlcCAyLiBDbGVhbiBjb2x1bW4gbmFtZXMgdXNpbmcgdGlkeXIgLyBjbGVhbnIuCiMgCiMgU3RlcCAzLiBDaGFuZ2UgY29sdW1uIG5hbWVzIHRvIHJlbW92ZSB0aGUgW10uCiMgCiMgU3RlcCA0LiBDaGFuZ2UgY29sdW1uIG5hbWVzIHRvIGNvbmZpcm0gdG8gYmVzdCBwcmFjdGljZSwgZS5nLiAiaG93IG9sZCBhcmUgeW91IgojIHdpbGwgYmVjb21lICJhZ2UiLgojIAojIFN0ZXAgNS4gQ2hhbmdlIHRpbWVzdGFtcCB0byB5ZWFyIC0gMjAxNS4KIyAKIyBTdGVwIDYuIENsZWFuIGFnZSBjb2x1bW4gdG8gY2hhbmdlIHN0cmluZyBhbnN3ZXJzIHRvIE5BLgojIAojIFN0ZXAgNy4gQ2hhbmdlIGFnZSBjb2x1bW4gdHlwZSB0byBudW1lcmljLgojIAojIFN0ZXAgOC4gQ2xlYW4gY291bnRyeSBuYW1lczsgZW5zdXJlIGFsbCBjb3VudHJpZXMgYXJlIGNhcGl0YWxpc2VkLgojIAojIFN0ZXAgOS4gQ2hhbmdlIGFsbCB2ZXJzaW9ucyBvZiBVU0EgdG8gVVNBLCBhbmQgc2ltaWxhciBmb3Igb3RoZXIgY291bnRyaWVzLgojIAojIFN0ZXAgMTAuIFJlbW92ZSBpbmNvcnJlY3Qgc3RyaW5ncy4gCiMgCiMgU3RlcCAxMS4gQ2xlYW4gc3RhdGUgY29sdW1uLCBpLmUuIGVuc3VyZSBhbGwgc3RyaW5ncyBhcmUgY29ycmVjdC4KIyAKIyBTdGVwIDEyLiBDaGFuZ2UgYWxsIFVTQSBhbmQgY2FuYWRpYW4gc3RhdGVzIHRvIHNhbWUgZm9ybWF0LCBlLmcuIFROLCBVU0EKIyAKYGBgCgpgYGB7cn0KIyBKb2luaW5nIGRhdGFzZXRzIHRvZ2V0aGVyCiMgUGl2b3QgZWFjaCB0YWJsZSB0byBoYXZlIHllYXIgaW4gYSBjb2x1bW4gaGVhZGluZywgYW5kIHRoZSBpbmRpdmlkdWFsIHZhbHVlcyBpbiByb3dzLgojIEZyb20gdGhlcmUgdGhlbiBqb2luIHRoZW0/CgpgYGAKCgoKYGBge3J9CgoKIyBBbmFseXNpcyBxdWVzdGlvbnM6CiMgV2hhdCBpcyB0aGUgdG90YWwgbnVtYmVyIG9mIGNhbmR5IHJhdGluZ3MgZ2l2ZW4gYWNyb3NzIHRoZSB0aHJlZSB5ZWFycy4gKE51bWJlciBvZiBjYW5keSByYXRpbmdzLCBub3QgdGhlIG51bWJlciBvZiByYXRlcnMuIERvbuKAmXQgY291bnQgbWlzc2luZyB2YWx1ZXMpCiMgV2hhdCB3YXMgdGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZz8KIyBXaGF0IHdhcyB0aGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgbm90IGdvaW5nIHRyaWNrIG9yIHRyZWF0aW5nPwojIEZvciBlYWNoIG9mIGpveSwgZGVzcGFpciBhbmQgbWVoLCB3aGljaCBjYW5keSBiYXIgcmV2aXZlZCB0aGUgbW9zdCBvZiB0aGVzZSByYXRpbmdzPwojIEhvdyBtYW55IHBlb3BsZSByYXRlZCBTdGFyYnVyc3QgYXMgZGVzcGFpcj8KIyAKIyBGb3IgdGhlIG5leHQgdGhyZWUgcXVlc3Rpb25zLCBjb3VudCBkZXNwYWlyIGFzIC0xLCBqb3kgYXMgKzEsIGFuZCBtZWggYXMgMC4KIyAKIyBXaGF0IHdhcyB0aGUgbW9zdCBwb3B1bGFyIGNhbmR5IGJhciBieSB0aGlzIHJhdGluZyBzeXN0ZW0gZm9yIGVhY2ggZ2VuZGVyIGluIHRoZSBkYXRhc2V0ID8KIyBXaGF0IHdhcyB0aGUgbW9zdCBwb3B1bGFyIGNhbmR5IGJhciBpbiBlYWNoIHllYXI/CiMgV2hhdCB3YXMgdGhlIG1vc3QgcG9wdWxhciBjYW5keSBiYXIgYnkgdGhpcyByYXRpbmcgZm9yIHBlb3BsZSBpbiBVUywgQ2FuYWRhLCBVSywgYW5kIGFsbCBvdGhlciBjb3VudHJpZXM/CmBgYAo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyBEaXJ0eSBEYXRhIC0gTG91aXNlIFNoYW1icm9vawojIyAyNi8xMS8yMDIxCgojIyMgLSBSZXF1aXJlZCBsaWJyYXJpZXMKYGBge3J9CmxpYnJhcnkocmVhZHIpCmxpYnJhcnkocmVhZHhsKQpsaWJyYXJ5KGRwbHlyKQpsaWJyYXJ5KGhlcmUpCiNjYWxsaW5nIGxpYnJhcmllcwpgYGAKCiMjIFBvaW50cyB0byBpbmNsdWRlIGluIGZpbmFsIHJlcG9ydDoKLSBBIGJyaWVmIGludHJvZHVjdGlvbiB0byB0aGUgZGF0YXNldAotIEEgbGlzdCBvZiBhbnkgYXNzdW1wdGlvbnMgeW91IGhhdmUgbWFkZQotIFRoZSBzdGVwcyB5b3UgdG9vayB0byBjbGVhbiB0aGUgZGF0YSAoeW91IGRvbuKAmXQgbmVlZCB0byB3cml0ZSBvdXQgaW4gZGV0YWlsIGV2ZXJ5IHN0ZXAsIGJ1dCBhIGNvbWJpbmF0aW9uIG9mIGNvbW1lbnRlZCBjb2RlIGNodW5rcyB3aXRoIHN1cnJvdW5kaW5nIG92ZXJhbGwgZXhwbGFuYXRpb25zIHdvdWxkIGJlIGdyZWF0KS4KLSBUaGUgYW5zd2VycyB0byB0aGUgcXVlc3Rpb25zIHByZXNlbnRlZCBpbiB0aGUgdGFzayBicmllZgotIEFueSBvdGhlciBpbnRlcmVzdGluZyBhbmFseXNlcyBvciBjb25jbHVzaW9ucyB5b3UgY29tZSBhY3Jvc3MuCgojIEZpbmFsIHJlcG9ydCAoZHJhZnQpCgojIyMgQnJpZWYgSW50cm9kdWN0aW9uIHRvIHRoZSBkYXRhc2V0CkluIDIwMDYsIERhdmlkIE5nIGFuZCBCZW4gQ29oZW4gYmVnYW4gdG8gcmFuayBjYW5keSBiYXNlZCBvbiB0aGVpciBsb2NhdGlvbgppbiBnZW9sb2dpY2FsIHN0cmF0YSwgZm9yIHRyaWNrIG9yIHRyZWF0aW5nIHB1cnBvc2VzLiBUaGlzIGhhcyBkZXZlbG9wZWQgb3Zlcgp0aGUgeWVhcnMgaW50byBhICJub3QgcXVpdGUgc29jaWFsIHNjaWVuY2UgbGVnaXQgc3VydmV5Ii4gQXMgb2YgMjAxOSwgdGhpcyBoYXMgCmJlY29tZSBhIHdheSBvZiBtZWFzdXJpbmcgIm5ldCBmZWVsaWVzIiB3aGVuIHRyaWNrIG9yIHRyZWF0aW5nLCBmb3IgYSB3aWRlIHJhbmdlCm9mIGNhbmRpZXMsIHdoaWNoIGNyaXRpY2FsbHkgaW5jbHVkZXMgaXRlbXMgc3VjaCBhcyBodWdzLCBnbG93IHN0aWNrcyBhbmQgYnJlYWQuCgpTb3VyY2U6IGh0dHBzOi8vYm9pbmdib2luZy5uZXQvYXV0aG9yL2RhdmlkbmcyCgojIyMgQnJpZWYgaW50cm9kdWN0aW9ucyB0byBhc3N1bXB0aW9ucwotIEkgaW50aWFsbHkgYXNzdW1lZCB0aGUgZGF0YXNldCB3YXMgY29tcGxldGUsIGkuZS4gdGhhdCB0aGUgY29sdW1ucyB3ZXJlIGNvcnJlY3QKKHNob3VsZCBiZSB0aGVyZSkuCi0gQXMgSSBiZWdhbiB0byBkaWcgaW4gdG8gaXQgYW5kIG9wZW5lZCBpdCBpbiBleGNlbCwgSSBsZWFybmVkIHRoYXQgc29tZSBvZgp0aGVzZSBjb3VsZCBiZSBkcm9wcGVkLgotIEkgdGhlbiBvdmVyLWNvcnJlY3RlZCBhbmQgdHJpZWQgdG8gZHJvcCB0b28gbWFueS4KLSBJIHRoZW4gYmVnYW4gdG8gcmVzZWFyY2ggdGhlIGJhY2tncm91bmQgb2YgdGhlIGRhdGFzZXQsIGFuZCBmb3VuZCB0aGF0IG9ubHkKc29tZSBvZiB0aGVzZSB3b3VsZCBuZWVkIHRvIGJlIGRyb3BwZWQuCi0gSSBhc3N1bWUgdGhhdCBtYW55IG9mIHRoZSBOQSdzIGNhbiBiZSBkcm9wcGVkL2NoYW5nZWQgd2l0aG91dCBjYXVzaW5nIG1hbnkgcHJvYmxlbXMuCi0gSSBhc3N1bWUgdGhhdCByZXNwb25kZW50cyB3aWxsIGdlbmVyYWxseSBvbmx5IGJlIGZyb20gdGhlIFVTIGFuZCBDYW5hZGEuCi0gSSBhc3N1bWUgdGhhdCBhZ2Ugd2lsbCBvbmx5IGJlIGdpdmVuIGluIHdob2xlIG51bWJlcnMuCgojIyMgU3RlcHMgdG8gY2xlYW4gdGhlIGRhdGEKLSBDaGFuZ2luZyBuYW1lcyBvZiBjb2x1bW5zCi0gQ2hhbmdpbmcgdGltZXN0YW1wIG9mIDIwMTUgYW5kIDIwMTYKLSBDaGFuZ2luZyBjb2x1bW4gdHlwZSBvZiBhZ2UKCiMjIEFuYWx5c2lzCgpXaGF0IGlzIHRoZSB0b3RhbCBudW1iZXIgb2YgY2FuZHkgcmF0aW5ncyBnaXZlbiBhY3Jvc3MgdGhlIHRocmVlIHllYXJzLgooTnVtYmVyIG9mIGNhbmR5IHJhdGluZ3MsIG5vdCB0aGUgbnVtYmVyIG9mIHJhdGVycy4gRG9u4oCZdCBjb3VudCBtaXNzaW5nIHZhbHVlcykKYGBge3J9Cmdyb3VwX2J5CnN1bW1hcmlzZShhY3Jvc3MoY291bnQpKQpgYGAKCldoYXQgd2FzIHRoZSBhdmVyYWdlIGFnZSBvZiBwZW9wbGUgd2hvIGFyZSBnb2luZyBvdXQgdHJpY2sgb3IgdHJlYXRpbmc/CmBgYHtyfQpmaWx0ZXIoZ29pbmdfb3V0ID0geWVzKQpncm91cF9ieShhZ2UpCnN1bW1hcmlzZShtZWFuKGFnZSkpCmBgYAoKV2hhdCB3YXMgdGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIG5vdCBnb2luZyB0cmljayBvciB0cmVhdGluZz8KYGBge3J9CmZpbHRlcihnb2luZ19vdXQgPSBubykKZ3JvdXBfYnkoYWdlKQpzdW1tYXJpc2UobWVhbihhZ2UpKQpgYGAKCkZvciBlYWNoIG9mIGpveSwgZGVzcGFpciBhbmQgbWVoLCB3aGljaCBjYW5keSBiYXIgcmVjZWl2ZWQgdGhlIG1vc3Qgb2YgdGhlc2UgcmF0aW5ncz8KYGBge3J9CgpgYGAKCkhvdyBtYW55IHBlb3BsZSByYXRlZCBTdGFyYnVyc3QgYXMgZGVzcGFpcj8KYGBge3J9CgpgYGAKCkZvciB0aGUgbmV4dCB0aHJlZSBxdWVzdGlvbnMsIGNvdW50IGRlc3BhaXIgYXMgLTEsIGpveSBhcyArMSwgYW5kIG1laCBhcyAwLgpXaGF0IHdhcyB0aGUgbW9zdCBwb3B1bGFyIGNhbmR5IGJhciBieSB0aGlzIHJhdGluZyBzeXN0ZW0gZm9yIGVhY2ggZ2VuZGVyIGluCnRoZSBkYXRhc2V0ID8KYGBge3J9CmZpbHRlcihmKQpncm91cF9ieShhY3Jvc3MoYWxsKGpveSkpKQpzdW1tYXJpc2Uoc3VtKG4pKQoKYGBgCgpXaGF0IHdhcyB0aGUgbW9zdCBwb3B1bGFyIGNhbmR5IGJhciBpbiBlYWNoIHllYXI/CmBgYHtyfQoKYGBgCgpXaGF0IHdhcyB0aGUgbW9zdCBwb3B1bGFyIGNhbmR5IGJhciBieSB0aGlzIHJhdGluZyBmb3IgcGVvcGxlIGluIFVTLCBDYW5hZGEsClVLLCBhbmQgYWxsIG90aGVyIGNvdW50cmllcz8KYGBge3J9CgpgYGAKCg==</div>
 
 
 

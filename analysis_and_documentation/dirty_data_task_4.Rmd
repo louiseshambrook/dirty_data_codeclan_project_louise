@@ -1,0 +1,106 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Dirty Data - Louise Shambrook
+## 26/11/2021
+
+### - Required libraries
+```{r}
+library(readr)
+library(readxl)
+library(dplyr)
+library(here)
+#calling libraries
+```
+
+## Points to include in final report:
+- A brief introduction to the dataset
+- A list of any assumptions you have made
+- The steps you took to clean the data (you don’t need to write out in detail every step, but a combination of commented code chunks with surrounding overall explanations would be great).
+- The answers to the questions presented in the task brief
+- Any other interesting analyses or conclusions you come across.
+
+# Final report (draft)
+
+### Brief Introduction to the dataset
+In 2006, David Ng and Ben Cohen began to rank candy based on their location
+in geological strata, for trick or treating purposes. This has developed over
+the years into a "not quite social science legit survey". As of 2019, this has 
+become a way of measuring "net feelies" when trick or treating, for a wide range
+of candies, which critically includes items such as hugs, glow sticks and bread.
+
+Source: https://boingboing.net/author/davidng2
+
+### Brief introductions to assumptions
+- I intially assumed the dataset was complete, i.e. that the columns were correct
+(should be there).
+- As I began to dig in to it and opened it in excel, I learned that some of
+these could be dropped.
+- I then over-corrected and tried to drop too many.
+- I then began to research the background of the dataset, and found that only
+some of these would need to be dropped.
+- I assume that many of the NA's can be dropped/changed without causing many problems.
+- I assume that respondents will generally only be from the US and Canada.
+- I assume that age will only be given in whole numbers.
+
+### Steps to clean the data
+- Changing names of columns
+- Changing timestamp of 2015 and 2016
+- Changing column type of age
+
+## Analysis
+
+What is the total number of candy ratings given across the three years.
+(Number of candy ratings, not the number of raters. Don’t count missing values)
+```{r}
+group_by
+summarise(across(count))
+```
+
+What was the average age of people who are going out trick or treating?
+```{r}
+filter(going_out = yes)
+group_by(age)
+summarise(mean(age))
+```
+
+What was the average age of people who are not going trick or treating?
+```{r}
+filter(going_out = no)
+group_by(age)
+summarise(mean(age))
+```
+
+For each of joy, despair and meh, which candy bar received the most of these ratings?
+```{r}
+
+```
+
+How many people rated Starburst as despair?
+```{r}
+
+```
+
+For the next three questions, count despair as -1, joy as +1, and meh as 0.
+What was the most popular candy bar by this rating system for each gender in
+the dataset ?
+```{r}
+filter(f)
+group_by(across(all(joy)))
+summarise(sum(n))
+
+```
+
+What was the most popular candy bar in each year?
+```{r}
+
+```
+
+What was the most popular candy bar by this rating for people in US, Canada,
+UK, and all other countries?
+```{r}
+
+```
+
