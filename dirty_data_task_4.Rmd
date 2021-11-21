@@ -1,0 +1,244 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+### Calling the required libraries
+```{r}
+library(readr)
+library(readxl)
+library(dplyr)
+```
+
+### Loading the datasets
+```{r}
+candy_2015 <- read_xlsx("candy_ranking_data/boing-boing-candy-2015.xlsx")
+candy_2016 <- read_xlsx("candy_ranking_data/boing-boing-candy-2016.xlsx")
+candy_2017 <- read_xlsx("candy_ranking_data/boing-boing-candy-2017.xlsx")
+```
+
+### Completing an initial exploration of the data.
+```{r}
+names(candy_2015)
+names(candy_2016)
+names(candy_2017)
+
+head(candy_2015)
+head(candy_2016)
+head(candy_2017)
+
+# At this point, it is of note that the column names are particularly messy and
+# will need cleaning.
+
+# It is of note that in the country column, data is quite messy.
+
+# It is also of note that in the age column, this is entered as a character.
+
+# In the 2015 and 2017 dataset, there is an "other" question, where there are 
+# candy responses. It is important to consider how to capture this data.
+
+```
+
+```{r}
+clean_candy_2015 <- candy_2015 %>% 
+  select(-c(16, 18, 23, 26, 27, 28, 33, 38, 41, 45, 56, 57, 85:94, 88, 93, 94, 110:114, 116:124))
+clean_candy_2015
+# removing the names which are clear-cut
+
+names(clean_candy_2015)
+
+clean_candy_2015 <- clean_candy_2015 %>% 
+  select(-c())
+clean_candy_2015
+
+6, 7, 12, 16, 
+```
+
+
+```{r}
+# clean each dataset sepearately
+# ---
+# 2015
+# 
+# Step 1. Drop columns.
+# 11?
+#   16
+# 18
+# 23
+# 26
+# 27
+# 28
+# 33
+# 34?
+#   38
+# 41
+# 45
+# 56
+# 57
+# 69?
+# 88
+# 93
+# 94
+# 100-114
+# 116-124
+# 
+# Second review:
+# filter out columns which used to be known/ associated with sweets/etc, or which
+# are borderline/generic cases, e.g.
+# 19 - free candy given out at restaurants
+# 
+# Step 2. Clean column names using tidyr / cleanr.
+# 
+# Step 3. Change column names to remove the [].
+# 
+# Step 4. Change column names to confirm to best practice, e.g. "how old are you"
+# will become "age".
+# 
+# Step 5. Change timestamp to year - 2015.
+# 
+# Step 6. Clean age column to change string answers to NA.
+# 
+# Step 7. Change age column type to numeric.
+# 
+
+```
+
+
+```{r}
+# 2016
+# 
+# Step 1. Drop columns.
+# 12
+# 13
+# 15
+# 21
+# 22
+# 26
+# 27
+# 31
+# 32
+# 38 ? (healthy fruit)
+# 43
+# 46
+# 48 ?
+#   49
+# 69
+# 79
+# 101
+# 102
+# 104
+# 105
+# 109-123
+# 
+# Second review:
+#   filter out columns which used to be known/ associated with sweets/etc, or which
+# are borderline/generic cases, e.g.
+# 19 - free candy given out at restaurants
+# 
+# Step 2. Clean column names using tidyr / cleanr.
+# 
+# Step 3. Change column names to remove the [].
+# 
+# Step 4. Change column names to confirm to best practice, e.g. "how old are you"
+# will become "age".
+# 
+# Step 5. Change timestamp to year - 2015.
+# 
+# Step 6. Clean age column to change string answers to NA.
+# 
+# Step 7. Change age column type to numeric.
+# 
+# Step 8. Clean country names; ensure all countries are capitalised.
+# 
+# Step 9. Change all versions of USA to USA, and similar for other countries.
+# 
+# Step 10. Remove incorrect strings. 
+# 
+# Step 11. Clean state column, i.e. ensure all strings are correct.
+# 
+# Step 12. Change all USA and canadian states to same format, e.g. TN, USA
+# 
+```
+
+
+
+```{r}
+# 2017
+# 
+# Step 1. Drop columns.
+# 12
+# 15
+# 21
+# 26
+# 31
+# 32
+# 38?
+#   43
+# 46
+# 48?
+# 49
+# 68
+# 69
+# 70
+# 81
+# 86
+# 104
+# 105
+# 107
+# 112-120
+# 
+# Second review:
+#   filter out columns which used to be known/ associated with sweets/etc, or which
+# are borderline/generic cases, e.g.
+# 19 - free candy given out at restaurants
+# 
+# Step 2. Clean column names using tidyr / cleanr.
+# 
+# Step 3. Change column names to remove the [].
+# 
+# Step 4. Change column names to confirm to best practice, e.g. "how old are you"
+# will become "age".
+# 
+# Step 5. Change timestamp to year - 2015.
+# 
+# Step 6. Clean age column to change string answers to NA.
+# 
+# Step 7. Change age column type to numeric.
+# 
+# Step 8. Clean country names; ensure all countries are capitalised.
+# 
+# Step 9. Change all versions of USA to USA, and similar for other countries.
+# 
+# Step 10. Remove incorrect strings. 
+# 
+# Step 11. Clean state column, i.e. ensure all strings are correct.
+# 
+# Step 12. Change all USA and canadian states to same format, e.g. TN, USA
+# 
+```
+
+```{r}
+# Joining datasets together
+# Pivot each table to have year in a column heading, and the individual values in rows.
+# From there then join them?
+
+```
+
+
+
+```{r}
+
+
+# Analysis questions:
+# What is the total number of candy ratings given across the three years. (Number of candy ratings, not the number of raters. Don’t count missing values)
+# What was the average age of people who are going out trick or treating?
+# What was the average age of people who are not going trick or treating?
+# For each of joy, despair and meh, which candy bar revived the most of these ratings?
+# How many people rated Starburst as despair?
+# 
+# For the next three questions, count despair as -1, joy as +1, and meh as 0.
+# 
+# What was the most popular candy bar by this rating system for each gender in the dataset ?
+# What was the most popular candy bar in each year?
+# What was the most popular candy bar by this rating for people in US, Canada, UK, and all other countries?
+```
