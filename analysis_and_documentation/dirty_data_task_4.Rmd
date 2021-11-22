@@ -12,7 +12,12 @@ library(readr)
 library(readxl)
 library(dplyr)
 library(here)
+library(janitor)
 #calling libraries
+```
+
+```{r}
+names(candy_2015)
 ```
 
 ## Points to include in final report:
@@ -44,6 +49,13 @@ some of these would need to be dropped.
 - I assume that many of the NA's can be dropped/changed without causing many problems.
 - I assume that respondents will generally only be from the US and Canada.
 - I assume that age will only be given in whole numbers.
+- That the "random" columns at the end, were indeed random, however upon further
+research and reading, I learned that these are indicators for charactor and that
+this has an impact on the ratings. I have then begun to think about how I can 
+change my data analysis to reflect this, as the time constraints of the project
+means that realistically means I will not be able to include all of them.
+Source: https://boingboing.net/2015/10/31/the-candy-hierarchy-2015-your.html
+Table 1B. 
 
 ### Steps to clean the data
 - Changing names of columns
@@ -102,5 +114,71 @@ What was the most popular candy bar by this rating for people in US, Canada,
 UK, and all other countries?
 ```{r}
 
+```
+
+Any other interesting analyses or conclusions you come across.
+```{r}
+# Not my analysis, but if I have time, I would like to replicate it:
+# ://boingboing.net/2015/10/31/the-candy-hierarchy-2015-your.html
+# Table 1.B
+```
+
+```{r}
+clean_2015 <- clean_names(candy_2015)
+
+clean_2015 <- clean_2015 %>%
+  rename(age = how_old_are_you,
+         going_out = are_you_going_actually_going_trick_or_treating_yourself,
+         year = timestamp,
+         hersheys_kissables= hershey_s_kissables,
+         hersheys_milk_chocolate = hershey_s_milk_chocolate,
+         remarks_or_comments = please_leave_any_remarks_or_comments_regarding_your_choices,
+         items_not_included_joy = please_list_any_items_not_included_above_that_give_you_joy,
+         items_not_included_despair = please_list_any_items_not_included_above_that_give_you_despair
+         )
+
+clean_2015 <- clean_2015 %>%
+  transform(age = as.numeric(age))
+  
+clean_2015 <- clean_2015 %>%
+  relocate(necco_wafers, .after = york_peppermint_patties)
+
+clean_2015$year <- 2015
+# reassigning the year column to 2015
+
+```
+
+
+```{r}
+clean_2016 <- clean_names(candy_2016)
+# cleaning column names using clean_names from janitor package
+
+clean_2016 <- clean_2016 %>%
+rename(age = how_old_are_you,
+       going_out = are_you_going_actually_going_trick_or_treating_yourself,
+       year = timestamp,
+       gender = your_gender,
+       country = which_country_do_you_live_in,
+       state = which_state_province_county_do_you_live_in,
+       hersheys_milk_chocolate = hershey_s_milk_chocolate,
+)
+#cleaning column names
+
+names(clean_2016)
+
+# the columns at the end, i.e "please estimate" etc have NOT been changed, as 
+# I am not sure of the extent to which I am keeping these
+
+clean_2016 <- clean_2016 %>%
+  transform(age = as.numeric(age))
+# changing age column type, and at the same time, changing strings to NA 
+# by coercion
+
+# clean_2015 <- clean_2016 %>%
+#   relocate(necco_wafers, .after = york_peppermint_patties)
+# moving the necco wafers column to after york peppermint
+
+clean_2016$year <- 2016
+# reassigning the year column to 2015
 ```
 
