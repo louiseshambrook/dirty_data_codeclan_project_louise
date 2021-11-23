@@ -16,6 +16,7 @@ library(dplyr)
 library(here)
 library(janitor)
 library(stringr)
+library(tidyverse)
 #calling libraries
 ```
 
@@ -124,6 +125,14 @@ Any other interesting analyses or conclusions you come across.
 # Not my analysis, but if I have time, I would like to replicate it:
 # ://boingboing.net/2015/10/31/the-candy-hierarchy-2015-your.html
 # Table 1.B
+
+# EXTENSION
+# Step 7. For the "please leave"/"please List" columns, create a coding matrix,
+# code the data.
+# Step 8. Mints - change all non-numeric data to numeric.
+# Step 9. Betty/Ver - Change all ?? to NA.
+# Step 10. "Check all that apply" - split columns.
+# Step 11. Add NA's to all the "random" columns in the blanks.
 ```
 
 
@@ -141,6 +150,8 @@ clean_2015 <- clean_2015 %>%
          items_not_included_joy = please_list_any_items_not_included_above_that_give_you_joy,
          items_not_included_despair = please_list_any_items_not_included_above_that_give_you_despair
   )
+
+
 
 clean_2015 <- clean_2015 %>%
   relocate(necco_wafers, .after = york_peppermint_patties)
@@ -163,9 +174,15 @@ clean_2015$age[clean_2015$age == "42 - I'm taking my kid"] <- 42
 clean_2015$age[clean_2015$age == "42 - I'm taking my kid"] <- 42
 clean_2015$age[clean_2015$age == "50t"] <- 50                 
 
+# with this, I need to think about assertive programming and adding that in
+
 clean_2015 <- clean_2015 %>%
   transform(age = as.numeric(age))
 
+clean_2015 <- clean_2015 %>%
+  add_column(gender = NA, .after = "going_out") %>%
+  add_column(country = NA, .after = "gender") %>%
+  add_column(state = NA, .after = "country")
 
 # 2016 CLEANING ---------------------------------------------------------------
 
@@ -189,7 +206,8 @@ clean_2016$year <- 2016
 clean_2016 %>%
   filter(country == "United States of America")
 
-
+clean_2016 <- clean_2016 %>%
+  relocate(age, .after = year)
 
 
 # Change all versions of USA to USA, and similar for other countries.
@@ -210,14 +228,17 @@ clean_2017 <- clean_2017 %>%
           age = q3_age,
           country = q4_country,
           state = q5_state_province_county_etc)
+clean_2017 <- clean_2017 %>%
+  rename(year = internal_id)
 
+# Need to do an across or something to remove q6 from 7-109.
+# Worst case; Ill hardcode it
 
-Need to do an across or something to remove q6 from 7-109.
-Worst case; Ill hardcode it
+# clean_2017 %>%
+#   mutate(across(.cols, str_replace, "q", ""))
 
-clean_2017 %>%
-  mutate(across(.cols, str_replace, "q", ""))
-
+clean_2017 <- clean_2017 %>%
+  relocate(age, .after = year)
 
 clean_2017$internal_id <- 2017
 # reassigning the internal_id column to 2017
@@ -235,6 +256,7 @@ clean_2017$age[clean_2017$age == "46 Halloweens"] <- 46
 clean_2017 <- clean_2017 %>%
   transform(age = as.numeric(age))
 
+replacing q6 - how to replace q6 in dplyr - extract columnm change and reassign
 
 # Clean country names; ensure all countries are capitalised.
 
@@ -263,8 +285,12 @@ clean_2016 %>%
 
 # Work in progress
 
+usa_pattern <- "[wrlyutoceaAnisbISUk]."
+
 clean_2016 %>%
-  mutate(country = str_detect(country, "[wrlyutoceaAnisbISUk]."))
+  mutate(country = str_replace(country, "[wrlyutoceaAnisbISUk].", "USA"))
+
+
 
 # pattern <- "[A-Z][a-z]+ [0-9]+(th|rd|st|nd), [0-9]{4}"
 # whole_text %>%

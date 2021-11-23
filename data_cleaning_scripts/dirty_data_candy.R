@@ -43,14 +43,6 @@ head(candy_2017)
 # Step 6. Necco wafers - move to after york peppermints.
 # - 2015 doesn't have gender, and 2016/2017 does
 
-# EXTENSION
-# Step 7. For the "please leave"/"please List" columns, create a coding matrix,
-# code the data.
-# Step 8. Mints - change all non-numeric data to numeric.
-# Step 9. Betty/Ver - Change all ?? to NA.
-# Step 10. "Check all that apply" - split columns.
-# Step 11. Add NA's to all the "random" columns in the blanks.
-
 # For 2015:
 # Change timestamp to year - 2015.
 
@@ -64,6 +56,7 @@ head(candy_2017)
 # 2017 - remove the column after dress question (blank title)
 
 # To join the datasets together.
+# To make joining easier, should I drop the columns at the end? 
 # Pivot each table to have the year in the column heading, and values in rows.
 # Join them from there.
 
