@@ -13,14 +13,7 @@ candy_2015 <- read_xlsx(here::here("raw_data/boing-boing-candy-2015.xlsx"))
 candy_2016 <- read_xlsx(here::here("raw_data/boing-boing-candy-2016.xlsx"))
 candy_2017 <- read_xlsx(here::here("raw_data/boing-boing-candy-2017.xlsx"))
 
-# Initial exploration ---------------------------
-names(candy_2015)
-names(candy_2016)
-names(candy_2017)
 
-head(candy_2015)
-head(candy_2016)
-head(candy_2017)
 
 # Initial thoughts -----------------------------
 # The columns are a bit troublesome, and don't really align with the data posted
