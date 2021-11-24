@@ -2,16 +2,14 @@
 title: "R Notebook"
 output: html_notebook
 ---
-
-NOTE TO MYSELF - WHEN I PICK UP ON TUESDAY - MOVE NOTES OVER FROM HERE to R SCRIPT
-
 ## TO DO
-- Assertive programming
-- Unit tests
-
-- include documentation for all decisions, e.g. why dropping certain columns
-
-
+- do 2017 documentation 
+- check ages for 2016 and fix coding / documentation
+- fix regex for USA
+- make regex for Canada
+- make regex for UK
+- remove "other" names from countries
+- fix bug with 2016 dataframe (picking up 3 additional columns)
 
 # Dirty Data - Louise Shambrook
 ## 26/11/2021
@@ -27,10 +25,6 @@ library(stringr)
 library(tidyverse)
 library(assertr)
 #calling libraries
-```
-
-```{r}
-names(candy_2015)
 ```
 
 ## Points to include in final report:
@@ -84,7 +78,7 @@ candy_2016 <- read_xlsx(here::here("raw_data/boing-boing-candy-2016.xlsx"))
 candy_2017 <- read_xlsx(here::here("raw_data/boing-boing-candy-2017.xlsx"))
 ```
 
-2015 Cleaning
+Code to load the frames
 ```{r}
 clean_2015 <- clean_names(candy_2015)
 clean_2015 <- clean_2015 %>%
@@ -125,23 +119,6 @@ clean_2015 <- clean_2015 %>%
   select(-101, -102, -103, -104, -105, -106, -107, -108, -109, -110, -111, 
          -112, -113, -114, -115, -116, -117, -118, -119, -120, -121, -122,
          -123, -124, -125, -126, -127)
-
-## THIS IS MY ATTEMPT AT ASSERTIVE PROGRAMMING - ASK SOMEONE LATER
-# clean_data_2015_age <- function(age_people) {
-#   #check age
-#   age_people %>%
-#     verify(age >0 & age <= 80)
-#   
-#   #average_age
-#   average_age <- 
-#     age_people %>%
-#     summarise(
-#       mean_age = mean(age)
-#     )
-#   return(list(mean_age))
-# }    
-#assertive programming function  
-
 clean_2015 <- clean_2015 %>%
   mutate(age = na_if(age, 1.23000e+02)) %>%
   mutate(age = na_if(age, 9.00000e+22)) %>%
@@ -162,9 +139,7 @@ clean_2015 <- clean_2015 %>%
   mutate(age = na_if(age, 9.70000e+01)) %>%
   mutate(age = na_if(age, 4.90000e+02)) %>%
   mutate(age = na_if(age, 350))
-```
 
-```{r}
 clean_2016 <- clean_names(candy_2016)
 clean_2016 <- clean_2016 %>%
   rename(age = how_old_are_you,
@@ -184,69 +159,73 @@ clean_2016 <- clean_2016 %>%
   select(-107, -108, -109, -110, -111, 
          -112, -113, -114, -115, -116, -117, -118, -119, -120, -121, -122,
          -123)
-
-clean_2016 <- clean_2016 %>%
-  mutate(country = str_to_title())
-
-# cleaning USA
-clean_2016 <- clean_2016 %>%
-  mutate(country = str_replace(country, "[u][sS][aA]", "USA")) %>%
-  mutate(country = str_replace(country, "[uU][s]", "USA")) %>%
-  mutate(country = str_replace(country, "^US$", "USA")) %>%
-  mutate(country = str_replace(country, "^Usa$", "USA")) %>%
-  mutate(country = str_replace(country, "^USA!", "USA")) %>%
-  mutate(country = str_replace(country, "^USA USA USA$", "USA")) %>%
-  mutate(country = str_replace(country, "[U][s][a]", "USA")) %>%
-  mutate(country = str_replace(country, "^Usa!$", "USA")) %>%
-  mutate(country = str_replace(country, "[U][.][S][.][A][.]", "USA")) %>%
-  mutate(country = str_replace(country, "^United States of America$", "USA")) %>%
-  mutate(country = str_replace(country, "[uU][n][i][t][e][d][ ][Ss][t][a][t][e][s]", "USA")) %>%
-  mutate(country = str_replace(country, "^Murica$", "USA")) %>%
-  mutate(country = str_replace(country, "^U.S.$", "USA")) %>%
-  mutate(country = str_replace(country, "^USA USA! USA!", "USA"))
-
-# removing NA/not input countries
 clean_2016 <- clean_2016 %>%
   mutate(country = na_if(country, "A tropical island south of the equator")) %>%
   mutate(country = na_if(country, "Neverland")) %>%
-  mutate(country = na_if(country, 51.0)) %>%
-  mutate(country = na_if(country, 47.0)) %>%
-  mutate(country = na_if(country, 54.0)) %>%
-  mutate(country = na_if(country, 44.0)) %>%
-  mutate(country = na_if(country, 45.0)) %>%
-  mutate(country = na_if(country, 30.0)) %>%
+  mutate(country = na_if(country, "51.0")) %>%
+  mutate(country = na_if(country, "47.0")) %>%
+  mutate(country = na_if(country, "54.0")) %>%
+  mutate(country = na_if(country, "44.0")) %>%
+  mutate(country = na_if(country, "45.0")) %>%
+  mutate(country = na_if(country, "30.0")) %>%
   mutate(country = na_if(country, "one of the best ones")) %>%
   mutate(country = na_if(country, "there isn't one for old men")) %>%
   mutate(country = na_if(country, "god's country")) %>%
   mutate(country = na_if(country, "see above")) %>%
-  mutate(country = na_if(country, 45.0)) %>%
+  mutate(country = na_if(country, "45.0")) %>%
   mutate(country = na_if(country, "this one")) %>%
-  mutate(country = na_if(country, "somewhere"))
-
-# clean_2016 %>%
-#   filter(country != "USA", country != "Canada", country != "UK", country != "United Kingdom",
-#          country != "Japan", country != "france")
-
-# Note - this is incomplete.
-
+  mutate(country = na_if(country, "somewhere")) %>%
+  mutate(country = na_if(country, "Somewhere")) %>%
+  mutate(country = na_if(country, "EUA")) %>%
+  mutate(country = na_if(country, "Cascadia")) %>%
+  mutate(country = na_if(country, "Trumpistan")) %>%
+  mutate(country = na_if(country, "See above")) %>%
+  mutate(country = na_if(country, "Not the USA or Canada")) %>%
+  mutate(country = na_if(country, "The republic of Cascadia")) %>%
+  mutate(country = na_if(country, "Denial"))
+clean_2016 <- clean_2016 %>%
+  mutate(country = str_replace(country, "^usa$|^US$|^uSA$|^U.S.A$|^USA!$|^Us$|^Murica$|^USA! USA! USA!$|
+                               ^the best one - usa$|^united states$|^United States of America$|^us$|
+                               ^U.S.A.$|^America$|^The Yoo Ess of Aaayyyyyy$|
+                               ^Units States$|^United states$|
+                               ^USA!!!!!!$|^USSA$|^U.S.A.$|^Usa$|^U.S.A.$
+                               |^Units States$|^united states of america$
+                               |^Sub-Canadian North America... 'Merica$", "USA")) %>%
+  mutate(country = str_replace(country, "^United States$|
+                               ^USA (I think but it's an election year so who can really tell)$
+                               |^USA USA USA$|^U.S.$|^u.s.$
+                               |^united states of america$|^USA!!!!!!$
+                               |^USA! USA!$|^United Sates$|^UNited States$
+                               |^Merica$|^UNited States$|^america$
+                               |^United State$", "USA"))
+clean_2016 <- clean_2016 %>%
+  mutate(country = str_replace(country, "^England$|^United Kingdom$|^uk$|
+                               ^United Kindom$|^england$", "UK"))
+clean_2016 <- clean_2016 %>%
+  mutate(country = str_replace(country, "^canada$", "Canada")) %>%
+  mutate(country = str_replace(country, "^france$" , "France")) %>%
+  mutate(country = str_replace(country, "^belgium$", "Belgium")) %>%
+  mutate(country = str_replace(country, "^croatia$", "Croatia")) %>%
+  mutate(country = str_replace(country, "^españa$", "Spain")) %>%
+  mutate(country = str_replace(country, "^sweden$", "Sweden")) %>%
+  mutate(country = str_replace(country, "^germany$" , "Germany")) %>%
+  mutate(country = str_replace(country, "^netherlands$|^The Netherlands$",
+                               "Netherlands")) %>%
+  mutate(country = str_replace(country, "^kenya$", "Kenya")) %>%
+  mutate(country = str_replace(country, "^hungary$", "Hungary"))
 clean_2016 <- clean_2016 %>%
   mutate(age = na_if(age, 8.10e+01)) %>%
   mutate(age = na_if(age, 1.00e+18)) %>%
   mutate(age = na_if(age, 8.20e+01)) %>%
   mutate(age = na_if(age, 1.42e+02))
 
-```
 
-```{r}
 clean_2017 <- clean_names(candy_2017)
-
 clean_2017 <- clean_2017 %>%
   rename(year = internal_id)
 clean_2017$year <- 2017
-
 clean_2017 <- clean_2017 %>%
   select(-110, -111, -112, -113, -114, -115, -116, -117, -118, -119, -120)
-
 clean_2017 <- clean_2017 %>%
   rename(going_out = q1_going_out,
          gender = q2_gender,
@@ -257,10 +236,8 @@ clean_2017$age[clean_2017$age == "sixty-nine"] <- 69
 clean_2017$age[clean_2017$age == "46 Halloweens"] <- 46
 clean_2017 <- clean_2017 %>%
   relocate(age, .after = year)
-
 clean_2017 <- clean_2017 %>%
   transform(age = as.numeric(age))
-
 clean_2017 <- clean_2017 %>%
   mutate(age = na_if(age, 90)) %>%
   mutate(age = na_if(age, 312)) %>%
@@ -269,41 +246,68 @@ clean_2017 <- clean_2017 %>%
   mutate(age = na_if(age, 102)) %>%
   mutate(age = na_if(age, 100)) %>%
   mutate(age = na_if(age, 1000))
-
 clean_2017 <- clean_2017 %>% 
   rename_with(.cols = starts_with("q6_"), .fn = ~str_replace(.x, "q6_", ""))
-
 clean_2017 <- clean_2017 %>%
-  mutate(country = str_replace(country, "[u][sS][aA]", "USA")) %>%
-  mutate(country = str_replace(country, "[uU][s]", "USA")) %>%
-  mutate(country = str_replace(country, "^US$", "USA")) %>%
-  mutate(country = str_replace(country, "^Usa$", "USA")) %>%
-  mutate(country = str_replace(country, "^USA!", "USA")) %>%
-  mutate(country = str_replace(country, "^USA USA USA$", "USA")) %>%
-  mutate(country = str_replace(country, "[U][s][a]", "USA")) %>%
-  mutate(country = str_replace(country, "^Usa!$", "USA")) %>%
-  mutate(country = str_replace(country, "[U][.][S][.][A][.]", "USA")) %>%
-  mutate(country = str_replace(country, "^United States of America$", "USA")) %>%
-  mutate(country = str_replace(country, "[uU][n][i][t][e][d][ ][Ss][t][a][t][e][s]", "USA")) %>%
-  mutate(country = str_replace(country, "^Murica$", "USA")) %>%
-  mutate(country = str_replace(country, "^U.S.$", "USA")) %>%
-  mutate(country = str_replace(country, "^USA USA! USA!", "USA"))
+  mutate(country = na_if(country, 35)) %>%
+  mutate(country = na_if(country, "Earth")) %>%
+  mutate(country = na_if(country, "Europe")) %>%
+  mutate(country = na_if(country, 46)) %>%
+  mutate(country = na_if(country, "insanity lately")) %>%
+  mutate(country = na_if(country, 45)) %>%
+  mutate(country = na_if(country, 32)) %>%
+  mutate(country = na_if(country, "Can")) %>%
+  mutate(country = na_if(country, "Canae")) %>%
+  mutate(country = na_if(country, "Trumpistan")) %>%
+  mutate(country = na_if(country, "New York")) %>%
+  mutate(country = na_if(country, "Endland")) %>%
+  mutate(country = na_if(country, "soviet canuckistan")) %>%
+  mutate(country = na_if(country, 1)) %>%
+  mutate(country = na_if(country, "I don't know anymore")) %>%
+  mutate(country = na_if(country, "subscribe to dm4uz3 on youtube")) %>%
+  mutate(country = na_if(country, "Fear and Loathing")) %>%
+  mutate(country = na_if(country, "cascadia")) %>%
+  mutate(country = na_if(country, "I pretend to be from Canada, but I am really from the United States.")) %>%
+  mutate(country = na_if(country, "Ahem....Amerca")) %>%
+  mutate(country = na_if(country, "UD")) %>%
+  mutate(country = na_if(country, "endland")) %>%
+  mutate(country = na_if(country, "Atlantis")) %>%
+  mutate(country = na_if(country, "N. America")) %>%
+  mutate(country = na_if(country, "Narnia"))
+clean_2017 <- clean_2017 %>%
+  mutate(country = str_replace(country, "^us$|^usa$|^Us$|^US$|^United States of America$|
+                               ^United Staes$|^u.s.a$|^Usa$|^USAUSAUSA$|^america$|
+                               ^U.S.A$|^united states$|^Murica$|^United staes$|
+                               ^United states$|^u.s.a$|^u.s.a.$|^U.S.A.$|
+                               ^united states of america$|^US of A$|
+                               ^united states of america$|^The United States$
+                               |^Unites States$|^Unied States$|^U S$|
+                               ^U.S.$|^North Carolina$|
+                               ^The United States of America$|^USA? Hard to tell anymore..$
+                               |^'merica$|^usas$|^Pittsburgh$|^United State$|^New York$", "USA")) %>%
+  mutate(country = str_replace(country, "^United States$|^unhinged states$|^$
+                               |^The United States of America$|^unite states$
+                               |^U.S.$|^u.s.$|^A$|^United Sates$|^California$
+                               |^USa$|^United Stated$|^New Jersey$
+                               |^unite states$|^United ststes$|^United Statss$
+                               |^murrika$|^USA! USA! USA!$|^USAA$|^Alaska$
+                               |^united States$|^United Statea$|^America$
+                               |^	USA USA USA!!!!$|^California$ ", "USA"))
+clean_2017 <- clean_2017 %>%
+  mutate(country = str_replace(country, "^canada$|^Canada`$|^CANADA$", "Canada")) %>%
+  mutate(country = str_replace(country, "^france$" , "France")) %>%
+  mutate(country = str_replace(country, "^germany$" , "Germany")) %>%
+  mutate(country = str_replace(country, "^finland$", "Finland")) %>%
+  mutate(country = str_replace(country, "^australia$", "Australia")) %>%
+  mutate(country = str_replace(country, "^finland$", "Finland")) %>%
+  mutate(country = str_replace(country, "^The Netherlands$", "Netherlands")) %>%
+  mutate(country = str_replace(country, "^hong kong$", "Hong Kong")) %>%
+  mutate(country = str_replace(country, "^spain$", "Spain"))
+clean_2017 <- clean_2017 %>%
+  mutate(country = str_replace(country, "^England$|^United Kingdom$|^uk$|
+                               ^United Kindom$|^U.K.$|^Uk$|^Scotland$|
+                               ^United kingdom$", "UK"))
 
-```
-
-Beginning to join the dataframes - examine the difference between frames
-```{r}
-setdiff(names(clean_2015), names(clean_2016))
-setdiff(names(clean_2015), names(clean_2017))
-
-setdiff(names(clean_2016), names(clean_2015))
-setdiff(names(clean_2016), names(clean_2017))
-
-setdiff(names(clean_2017), names(clean_2015))
-setdiff(names(clean_2017), names(clean_2016))
-
-
-# Adding/renaming columns to the 2015 dataset
 
 clean_2015 <- clean_2015 %>%
   rename("100_grand_bar" = x100_grand_bar,
@@ -315,7 +319,6 @@ clean_2015 <- clean_2015 %>%
   hershey_s_milk_chocolate = hersheys_milk_chocolate,
   licorice_yes_black = licorice,
   sweetums_a_friend_to_diabetes = sweetums)
-
 clean_2015 <- clean_2015 %>%
   add_column(bonkers_the_board_game = NA) %>%
   add_column(chardonnay = NA) %>%
@@ -338,15 +341,11 @@ clean_2015 <- clean_2015 %>%
   add_column(tic_tacs = NA) %>%
   add_column(whatchamacallit_bars = NA) %>%
   add_column(dove_bars = NA)
-
-# Adding/renaming the 2016 dataset
-
 clean_2016 <- clean_2016 %>%
   rename("100_grand_bar" = x100_grand_bar,
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes =
            anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
            hershey_s_milk_chocolate = hersheys_milk_chocolate)
-
 clean_2016 <- clean_2016 %>%
   add_column(green_party_m_ms = NA) %>%
   add_column(independent_m_ms = NA) %>%    
@@ -365,14 +364,10 @@ clean_2016 <- clean_2016 %>%
   add_column(peanut_butter_jars = NA) %>%
   add_column(peanut_butter_bars = NA) %>%
   add_column(peterson_brand_sidewalk_chalk = NA)
-
 clean_2016 <- clean_2016 %>%
   select(-mary_janes) %>%
   select(-"third_party_m_ms") %>%
   select(-"person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes")
-
-# Adding/renaming the 2017 dataset
-
 clean_2017 <- clean_2017 %>%
   add_column(brach_products_not_including_candy_corn = NA) %>%
   add_column(bubble_gum = NA) %>%
@@ -385,9 +380,14 @@ clean_2017 <- clean_2017 %>%
   add_column(peanut_butter_jars = NA) %>%
   add_column(peanut_butter_bars = NA) %>%
   add_column(peterson_brand_sidewalk_chalk = NA)
-
-# Setting the order
-
+clean_2015 <- clean_2015 %>%
+  add_column(mary_janes = NA) %>%
+  add_column(third_party_m_ms = NA) %>%
+  add_column(person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes = NA)
+clean_2017 <- clean_2017 %>%
+  add_column(mary_janes = NA) %>%
+  add_column(third_party_m_ms = NA) %>%
+  add_column(person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes = NA)
 clean_2015 <- clean_2015 %>%
   select(year, age, going_out, gender, country, state, "100_grand_bar",
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
@@ -423,7 +423,8 @@ clean_2015 <- clean_2015 %>%
         york_peppermint_patties, brach_products_not_including_candy_corn,
         bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
         mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
-        peterson_brand_sidewalk_chalk)
+        peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
+        person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes)
 
 clean_2016 <- clean_2016 %>%
   select(year, age, going_out, gender, country, state, "100_grand_bar",
@@ -460,7 +461,9 @@ clean_2016 <- clean_2016 %>%
         york_peppermint_patties, brach_products_not_including_candy_corn,
         bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
         mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
-        peterson_brand_sidewalk_chalk)
+        peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
+        person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes)
+names(clean_2017)
 
 ```
 
@@ -472,32 +475,42 @@ joined_candy <- bind_rows(clean_2015, clean_2016, clean_2017)
 What is the total number of candy ratings given across the three years.
 (Number of candy ratings, not the number of raters. Don’t count missing values)
 ```{r}
-group_by
-summarise(across(count))
+table(joined_candy$`100_grand_bar`)
+table(joined_candy$`100_grand_bar`)
+
+
 ```
 
 What was the average age of people who are going out trick or treating?
 ```{r}
-filter(going_out = yes)
-group_by(age)
-summarise(mean(age))
+joined_candy %>%
+  select(age, going_out) %>%
+  filter(going_out == "Yes") %>%
+  summarise(mean_age = mean(age))
+
+# throwing NA - not sure why
 ```
 
 What was the average age of people who are not going trick or treating?
 ```{r}
-filter(going_out = no)
-group_by(age)
-summarise(mean(age))
-```
+joined_candy %>%
+  select(age, going_out) %>%
+  filter(going_out == "No") %>%
+  summarise(mean_age = mean(age))
 
+```
 
 For each of joy, despair and meh, which candy bar received the most of these ratings?
 ```{r}
+
 
 ```
 
 How many people rated Starburst as despair?
 ```{r}
+joined_candy %>%
+  select(starburst, year) %>%
+  filter(starbust == "DESPAIR")
 
 ```
 
@@ -505,6 +518,9 @@ For the next three questions, count despair as -1, joy as +1, and meh as 0.
 What was the most popular candy bar by this rating system for each gender in
 the dataset ?
 ```{r}
+
+
+
 filter(f)
 group_by(across(all(joy)))
 summarise(sum(n))
@@ -519,6 +535,7 @@ What was the most popular candy bar in each year?
 What was the most popular candy bar by this rating for people in US, Canada,
 UK, and all other countries?
 ```{r}
+
 
 ```
 
