@@ -1,62 +1,24 @@
-# Data Cleaning Script ---------------------------
+# Data Cleaning Script - Candy -------------------------------------------------
 
 # Calling libraries
-
 library(readr)
 library(readxl)
 library(dplyr)
 library(here)
+library(janitor)
+library(stringr)
+library(tidyverse)
+library(assertr)
 
 # Loading datasets ---------------------------
-
 candy_2015 <- read_xlsx(here::here("raw_data/boing-boing-candy-2015.xlsx"))
 candy_2016 <- read_xlsx(here::here("raw_data/boing-boing-candy-2016.xlsx"))
 candy_2017 <- read_xlsx(here::here("raw_data/boing-boing-candy-2017.xlsx"))
 
+# 2015 Cleaning ----------------------------------------------------------------
 
 
-# Initial thoughts -----------------------------
-# The columns are a bit troublesome, and don't really align with the data posted
-# on the official site.
-# The data in the country column will require cleaning.
-# The type of the country column is character.
-
-# DRAFT PLAN -----------------------------
-# Clean each dataset individually and then join them.
-# For each dataset
-
-# MVP
-# Step 1. Clean column names using tidyr / cleanr.
-# Step 2. Change column names to remove the [].
-# Step 3. Change column names to confirm to best practice, e.g. "how old are you"
-# will become "age".
-# Find all string answers and consider if there's a better method? Dropped a
-# Step 4. Clean age column to change string answers to NA.
-# Step 5. Change age column type to numeric.
-# Step 6. Necco wafers - move to after york peppermints.
-# - 2015 doesn't have gender, and 2016/2017 does
-
-# For 2015:
-# Change timestamp to year - 2015.
-
-# For 2016 and 2017. 
-# Clean country names; ensure all countries are capitalised.
-# Change all versions of USA to USA, and similar for other countries.
-# Remove incorrect strings. 
-# Clean state column, i.e. ensure all strings are correct.
-# Change all USA and canadian states to same format, e.g. TN, USA
-
-# 2017 - remove the column after dress question (blank title)
-
-# To join the datasets together.
-# To make joining easier, should I drop the columns at the end? 
-# Pivot each table to have the year in the column heading, and values in rows.
-# Join them from there.
-
-# 2015 CLEANING  --------------------------------------------------------------
 clean_2015 <- clean_names(candy_2015)
-# cleaning column names using clean_names from janitor package
-
 clean_2015 <- clean_2015 %>%
   rename(age = how_old_are_you,
          going_out = are_you_going_actually_going_trick_or_treating_yourself,
@@ -67,25 +29,9 @@ clean_2015 <- clean_2015 %>%
          items_not_included_joy = please_list_any_items_not_included_above_that_give_you_joy,
          items_not_included_despair = please_list_any_items_not_included_above_that_give_you_despair
   )
-# cleaning column names
-
-# the columns at the end, i.e "please estimate" etc have NOT been changed, as 
-# I am not sure of the extent to which I am keeping these
-
 clean_2015 <- clean_2015 %>%
   relocate(necco_wafers, .after = york_peppermint_patties)
-# moving the necco wafers column to after york peppermint
-
 clean_2015$year <- 2015
-# reassigning the year column to 2015
-
-# Cleaning the age column
-# There are 12 answers which indicate a specific answer, e.g. "40. Deal with it".
-# There are multiple which reference a vague answer, e.g "50s". It is not
-# reasonable to assume their answer - if there is time, I will go back and
-# replace these with "vague" (or similar). Then there are the outright "invalid"
-# answers, e.g. "old enough" which do not reference an age. These are NA.
-
 clean_2015$age[clean_2015$age == "45, but the 8-year-old Huntress and
                  bediapered Unicorn give me political cover and social
                  respectability.  However, I WILL eat more than they do
@@ -100,26 +46,133 @@ clean_2015$age[clean_2015$age == "27^"] <- 27
 clean_2015$age[clean_2015$age == "50, taking a 13 year old."] <- 50
 clean_2015$age[clean_2015$age == "42 - I'm taking my kid"] <- 42
 clean_2015$age[clean_2015$age == "42 - I'm taking my kid"] <- 42
-clean_2015$age[clean_2015$age == "50t"] <- 50 
-
-
-# There are also 12 column names with vague answers. If I have time, I will
-# go back and correct these.
-# For now, I will drop them.
-
+clean_2015$age[clean_2015$age == "50t"] <- 50                 
 clean_2015 <- clean_2015 %>%
   transform(age = as.numeric(age))
-# changing age column type, and at the same time, changing strings to NA 
-# by coercion
+clean_2015 <- clean_2015 %>%
+  add_column(gender = NA, .after = "going_out") %>%
+  add_column(country = NA, .after = "gender") %>%
+  add_column(state = NA, .after = "country")
+clean_2015 <- clean_2015 %>%
+  select(-101, -102, -103, -104, -105, -106, -107, -108, -109, -110, -111, 
+         -112, -113, -114, -115, -116, -117, -118, -119, -120, -121, -122,
+         -123, -124, -125, -126, -127)
 
-# Add a gender column??
+## THIS IS MY ATTEMPT AT ASSERTIVE PROGRAMMING - ASK SOMEONE LATER
+# clean_data_2015_age <- function(age_people) {
+#   #check age
+#   age_people %>%
+#     verify(age >0 & age <= 80)
+#   
+#   #average_age
+#   average_age <- 
+#     age_people %>%
+#     summarise(
+#       mean_age = mean(age)
+#     )
+#   return(list(mean_age))
+# }    
+#assertive programming function  
+
+clean_2015 <- clean_2015 %>%
+  mutate(age = na_if(age, 1.23000e+02)) %>%
+  mutate(age = na_if(age, 9.00000e+22)) %>%
+  mutate(age = na_if(age, 1.88000e+03)) %>%
+  mutate(age = na_if(age, 2.00587e+05)) %>%
+  mutate(age = na_if(age, 9.90000e+01)) %>%
+  mutate(age = na_if(age, 1.00000e+02)) %>%
+  mutate(age = na_if(age, 1.15000e+02)) %>%
+  mutate(age = na_if(age, 3.88000e+02)) %>%
+  mutate(age = na_if(age, 1.20000e+02)) %>%
+  mutate(age = na_if(age, 1.08000e+02)) %>%
+  mutate(age = na_if(age, Inf)) %>%
+  mutate(age = na_if(age, 9.90000e+01)) %>%
+  mutate(age = na_if(age, 2.00000e+03)) %>%
+  mutate(age = na_if(age, 3.50000e+02)) %>%
+  mutate(age = na_if(age, 4.00000e+02)) %>%
+  mutate(age = na_if(age, 8.50000e+01)) %>%
+  mutate(age = na_if(age, 9.70000e+01)) %>%
+  mutate(age = na_if(age, 4.90000e+02)) %>%
+  mutate(age = na_if(age, 350))
 
 
-# 2016 CLEANING ---------------------------------------------------------------
 
+
+clean_2015 <- clean_2015 %>%
+  rename("100_grand_bar" = x100_grand_bar,
+         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes = 
+           anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
+         bonkers_the_candy = bonkers,
+         boxo_raisins = box_o_raisins,
+         hersheys_dark_chocolate = dark_chocolate_hershey,
+         hershey_s_milk_chocolate = hersheys_milk_chocolate,
+         licorice_yes_black = licorice,
+         sweetums_a_friend_to_diabetes = sweetums)
+
+clean_2015 <- clean_2015 %>%
+  add_column(bonkers_the_board_game = NA) %>%
+  add_column(chardonnay = NA) %>%
+  add_column(coffee_crisp = NA) %>%
+  add_column(hersheys_kisses = NA) %>%
+  add_column(mike_and_ike = NA) %>%
+  add_column(blue_m_ms = NA) %>%
+  add_column(red_m_ms = NA) %>%
+  add_column(green_party_m_ms = NA) %>%
+  add_column(independent_m_ms = NA) %>%
+  add_column(abstained_from_m_ming = NA) %>%
+  add_column(mr_goodbar = NA) %>%
+  add_column(peeps = NA) %>%
+  add_column(real_housewives_of_orange_county_season_9_blue_ray = NA) %>%
+  add_column(reeses_pieces = NA) %>%
+  add_column(sandwich_sized_bags_filled_with_boo_berry_crunch = NA) %>%
+  add_column(sourpatch_kids_i_e_abominations_of_nature = NA) %>%
+  add_column(sweet_tarts = NA) %>%
+  add_column(take_5 = NA) %>%
+  add_column(tic_tacs = NA) %>%
+  add_column(whatchamacallit_bars = NA) %>%
+  add_column(dove_bars = NA)
+
+clean_2015 <- clean_2015 %>%
+  select(year, age, going_out, gender, country, state, "100_grand_bar",
+         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+         any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
+         bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+         butterfinger, cadbury_creme_eggs, candy_corn,
+         candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants,
+         caramellos, cash_or_other_forms_of_legal_tender, chardonnay, 
+         chick_o_sticks_we_don_t_know_what_that_is, chiclets, coffee_crisp,
+         creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, 
+         dove_bars, fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,
+         goo_goo_clusters, good_n_plenty, gum_from_baseball_cards,
+         gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+         hersheys_dark_chocolate, hershey_s_milk_chocolate, hersheys_kisses,
+         hugs_actual_physical_hugs, jolly_rancher_bad_flavor,
+         jolly_ranchers_good_flavor, joy_joy_mit_iodine, junior_mints,
+         senior_mints, kale_smoothie, kinder_happy_hippo, kit_kat, laffy_taffy,
+         lemon_heads, licorice_not_black, licorice_yes_black, lindt_truffle,
+         lollipops, mars, maynards, mike_and_ike, milk_duds, milky_way,
+         regular_m_ms, peanut_m_m_s, blue_m_ms, red_m_ms, green_party_m_ms,
+         independent_m_ms, abstained_from_m_ming, minibags_of_chips, mint_kisses,
+         mint_juleps, mr_goodbar, necco_wafers, nerds, nestle_crunch, nown_laters,
+         peeps, pencils, pixy_stix, real_housewives_of_orange_county_season_9_blue_ray,
+         reese_s_peanut_butter_cups, reeses_pieces, reggie_jackson_bar, rolos,
+         sandwich_sized_bags_filled_with_boo_berry_crunch, skittles,
+         smarties_american, smarties_commonwealth, snickers,
+         sourpatch_kids_i_e_abominations_of_nature, spotted_dick, starburst,
+         sweet_tarts, swedish_fish, sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+         those_odd_marshmallow_circus_peanut_things, three_musketeers,
+         tolberone_something_or_other, trail_mix, twix,
+         vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+         vicodin, whatchamacallit_bars, white_bread, whole_wheat_anything,
+         york_peppermint_patties, brach_products_not_including_candy_corn,
+         bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
+         mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
+         peterson_brand_sidewalk_chalk)
+
+
+
+# 2016 Cleaning ----------------------------------------------------------------
 clean_2016 <- clean_names(candy_2016)
-# cleaning column names using clean_names from janitor package
-
 clean_2016 <- clean_2016 %>%
   rename(age = how_old_are_you,
          going_out = are_you_going_actually_going_trick_or_treating_yourself,
@@ -129,107 +182,207 @@ clean_2016 <- clean_2016 %>%
          state = which_state_province_county_do_you_live_in,
          hersheys_milk_chocolate = hershey_s_milk_chocolate,
   )
-# There are none further to change.
-# the columns at the end, i.e "please estimate" etc have NOT been changed, as 
-# I am not sure of the extent to which I am keeping these
-
-# Cleaning the age column
-# There are none which indicate a specific answer.
-# There are 5 which reference a vague answer, e.g "50s". It is not
-# reasonable to assume their answer - if there is time, I will go back and
-# replace these with "vague" (or similar). Then there are the outright "invalid"
-# answers, e.g. "old enough" which do not reference an age. These are NA.
-
 clean_2016 <- clean_2016 %>%
   transform(age = as.numeric(age))
-# changing age column type, and at the same time, changing strings to NA 
-# by coercion
-
 clean_2016$year <- 2016
-# reassigning the year column to 2016
+clean_2016 <- clean_2016 %>%
+  relocate(age, .after = year)
+clean_2016 <- clean_2016 %>%
+  select(-107, -108, -109, -110, -111, 
+         -112, -113, -114, -115, -116, -117, -118, -119, -120, -121, -122,
+         -123)
 
-# Cleaning the country column
-# Cleaning country names
+clean_2016 <- clean_2016 %>%
+  mutate(country = str_to_title())
+
+# cleaning USA
+clean_2016 <- clean_2016 %>%
+  mutate(country = str_replace(country, "[u][sS][aA]", "USA")) %>%
+  mutate(country = str_replace(country, "[uU][s]", "USA")) %>%
+  mutate(country = str_replace(country, "^US$", "USA")) %>%
+  mutate(country = str_replace(country, "^Usa$", "USA")) %>%
+  mutate(country = str_replace(country, "^USA!", "USA")) %>%
+  mutate(country = str_replace(country, "^USA USA USA$", "USA")) %>%
+  mutate(country = str_replace(country, "[U][s][a]", "USA")) %>%
+  mutate(country = str_replace(country, "^Usa!$", "USA")) %>%
+  mutate(country = str_replace(country, "[U][.][S][.][A][.]", "USA")) %>%
+  mutate(country = str_replace(country, "^United States of America$", "USA")) %>%
+  mutate(country = str_replace(country, "[uU][n][i][t][e][d][ ][Ss][t][a][t][e][s]", "USA")) %>%
+  mutate(country = str_replace(country, "^Murica$", "USA")) %>%
+  mutate(country = str_replace(country, "^U.S.$", "USA")) %>%
+  mutate(country = str_replace(country, "^USA USA! USA!", "USA"))
+
+# removing NA/not input countries
+clean_2016 <- clean_2016 %>%
+  mutate(country = na_if(country, "A tropical island south of the equator")) %>%
+  mutate(country = na_if(country, "Neverland")) %>%
+  mutate(country = na_if(country, 51.0)) %>%
+  mutate(country = na_if(country, 47.0)) %>%
+  mutate(country = na_if(country, 54.0)) %>%
+  mutate(country = na_if(country, 44.0)) %>%
+  mutate(country = na_if(country, 45.0)) %>%
+  mutate(country = na_if(country, 30.0)) %>%
+  mutate(country = na_if(country, "one of the best ones")) %>%
+  mutate(country = na_if(country, "there isn't one for old men")) %>%
+  mutate(country = na_if(country, "god's country")) %>%
+  mutate(country = na_if(country, "see above")) %>%
+  mutate(country = na_if(country, 45.0)) %>%
+  mutate(country = na_if(country, "this one")) %>%
+  mutate(country = na_if(country, "somewhere"))
+
+# clean_2016 %>%
+#   filter(country != "USA", country != "Canada", country != "UK", country != "United Kingdom",
+#          country != "Japan", country != "france")
+
+# Note - this is incomplete.
+
+clean_2016 <- clean_2016 %>%
+  mutate(age = na_if(age, 8.10e+01)) %>%
+  mutate(age = na_if(age, 1.00e+18)) %>%
+  mutate(age = na_if(age, 8.20e+01)) %>%
+  mutate(age = na_if(age, 1.42e+02))
 
 
 
-# Change all versions of USA to USA, and similar for other countries.
 
-# Remove incorrect strings. 
+clean_2016 <- clean_2016 %>%
+  rename("100_grand_bar" = x100_grand_bar,
+         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes =
+           anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
+         hershey_s_milk_chocolate = hersheys_milk_chocolate)
 
-# Clean state column, i.e. ensure all strings are correct.
+clean_2016 <- clean_2016 %>%
+  add_column(green_party_m_ms = NA) %>%
+  add_column(independent_m_ms = NA) %>%    
+  add_column(abstained_from_m_ming = NA) %>%    
+  add_column(real_housewives_of_orange_county_season_9_blue_ray = NA) %>%    
+  add_column(sandwich_sized_bags_filled_with_boo_berry_crunch = NA) %>%    
+  add_column(take_5 = NA) %>%
+  add_column(brach_products_not_including_candy_corn = NA) %>%
+  add_column(bubble_gum = NA) %>%
+  add_column(hersheys_kissables = NA) %>%
+  add_column(lapel_pins = NA) %>%
+  add_column(runts = NA) %>%
+  add_column(mint_leaves = NA) %>%
+  add_column(mint_m_ms = NA) %>%
+  add_column(ribbon_candy = NA) %>%
+  add_column(peanut_butter_jars = NA) %>%
+  add_column(peanut_butter_bars = NA) %>%
+  add_column(peterson_brand_sidewalk_chalk = NA)
 
-# Change all USA and canadian states to same format, e.g. TN, USA
+clean_2016 <- clean_2016 %>%
+  select(-mary_janes) %>%
+  select(-"third_party_m_ms") %>%
+  select(-"person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes")
+
+clean_2016 <- clean_2016 %>%
+  select(year, age, going_out, gender, country, state, "100_grand_bar",
+         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+         any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
+         bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+         butterfinger, cadbury_creme_eggs, candy_corn,
+         candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants,
+         caramellos, cash_or_other_forms_of_legal_tender, chardonnay, 
+         chick_o_sticks_we_don_t_know_what_that_is, chiclets, coffee_crisp,
+         creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, 
+         dove_bars, fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,
+         goo_goo_clusters, good_n_plenty, gum_from_baseball_cards,
+         gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+         hersheys_dark_chocolate, hershey_s_milk_chocolate, hersheys_kisses,
+         hugs_actual_physical_hugs, jolly_rancher_bad_flavor,
+         jolly_ranchers_good_flavor, joy_joy_mit_iodine, junior_mints,
+         senior_mints, kale_smoothie, kinder_happy_hippo, kit_kat, laffy_taffy,
+         lemon_heads, licorice_not_black, licorice_yes_black, lindt_truffle,
+         lollipops, mars, maynards, mike_and_ike, milk_duds, milky_way,
+         regular_m_ms, peanut_m_m_s, blue_m_ms, red_m_ms, green_party_m_ms,
+         independent_m_ms, abstained_from_m_ming, minibags_of_chips, mint_kisses,
+         mint_juleps, mr_goodbar, necco_wafers, nerds, nestle_crunch, nown_laters,
+         peeps, pencils, pixy_stix, real_housewives_of_orange_county_season_9_blue_ray,
+         reese_s_peanut_butter_cups, reeses_pieces, reggie_jackson_bar, rolos,
+         sandwich_sized_bags_filled_with_boo_berry_crunch, skittles,
+         smarties_american, smarties_commonwealth, snickers,
+         sourpatch_kids_i_e_abominations_of_nature, spotted_dick, starburst,
+         sweet_tarts, swedish_fish, sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+         those_odd_marshmallow_circus_peanut_things, three_musketeers,
+         tolberone_something_or_other, trail_mix, twix,
+         vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+         vicodin, whatchamacallit_bars, white_bread, whole_wheat_anything,
+         york_peppermint_patties, brach_products_not_including_candy_corn,
+         bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
+         mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
+         peterson_brand_sidewalk_chalk)
 
 
-# 2017 Cleaning --------------------------------------------------------------
+# 2017 Cleaning ----------------------------------------------------------------
+
 clean_2017 <- clean_names(candy_2017)
-# cleaning column names using clean_names from janitor package
 
-# need to do an across or something to remove q6 from 7-109.
+clean_2017 <- clean_2017 %>%
+  rename(year = internal_id)
+clean_2017$year <- 2017
 
-# Manually change these
-# [2] "q1_going_out"                                                                    
-# [3] "q2_gender"                                                                       
-# [4] "q3_age"                                                                          
-# [5] "q4_country"                                                                      
-# [6] "q5_state_province_county_etc"                                                    
-# [110] "q7_joy_other"                                                                    
-# [111] "q8_despair_other"                                                                
-# [112] "q9_other_comments"                                                               
-# [113] "q10_dress"                                                                       
-# [114] "x114"                                                                            
-# [115] "q11_day"                                                                         
-# [116] "q12_media_daily_dish"                                                            
-# [117] "q12_media_science"                                                               
-# [118] "q12_media_espn"                                                                  
-# [119] "q12_media_yahoo"                                                                 
-# [120] "click_coordinates_x_y"  
+clean_2017 <- clean_2017 %>%
+  select(-110, -111, -112, -113, -114, -115, -116, -117, -118, -119, -120)
 
-# clean_2015 <- clean_2015 %>%
-#   rename(age = how_old_are_you,
-#   )
-# cleaning column names
+clean_2017 <- clean_2017 %>%
+  rename(going_out = q1_going_out,
+         gender = q2_gender,
+         age = q3_age,
+         country = q4_country,
+         state = q5_state_province_county_etc)
+clean_2017$age[clean_2017$age == "sixty-nine"] <- 69
+clean_2017$age[clean_2017$age == "46 Halloweens"] <- 46
+clean_2017 <- clean_2017 %>%
+  relocate(age, .after = year)
 
-# Remove column 114
-
-
-clean_2017$internal_id <- 2017
-# reassigning the internal_id column to 2017
-
-# Cleaning the age column
-# There are 2 answers which indicate a specific answer, e.g. "40. Deal with it".
-# There are 5 which reference a vague answer, e.g. "50's". It is not
-# reasonable to assume their answer - if there is time, I will go back and
-# replace these with "vague" (or similar). Then there are the outright "invalid"
-# answers, e.g. "old enough" which do not reference an age. These are NA.
-
-
-# These are the two to be corrected
-# sixty-nine
-# 46 Halloweens.
-
-
-#Syntax
-clean_2015$age[clean_2015$age == "45, but the 8-year-old Huntress and
-                 bediapered Unicorn give me political cover and social
-                 respectability.  However, I WILL eat more than they do
-                 combined."] <- 45
-
-clean_2015 <- clean_2015 %>%
+clean_2017 <- clean_2017 %>%
   transform(age = as.numeric(age))
-# Changing age column type, and at the same time, changing strings to NA 
-# by coercion
 
-# Cleaning country names
+clean_2017 <- clean_2017 %>%
+  mutate(age = na_if(age, 90)) %>%
+  mutate(age = na_if(age, 312)) %>%
+  mutate(age = na_if(age, 99)) %>%
+  mutate(age = na_if(age, 88)) %>%
+  mutate(age = na_if(age, 102)) %>%
+  mutate(age = na_if(age, 100)) %>%
+  mutate(age = na_if(age, 1000))
+
+clean_2017 <- clean_2017 %>% 
+  rename_with(.cols = starts_with("q6_"), .fn = ~str_replace(.x, "q6_", ""))
+
+clean_2017 <- clean_2017 %>%
+  mutate(country = str_replace(country, "[u][sS][aA]", "USA")) %>%
+  mutate(country = str_replace(country, "[uU][s]", "USA")) %>%
+  mutate(country = str_replace(country, "^US$", "USA")) %>%
+  mutate(country = str_replace(country, "^Usa$", "USA")) %>%
+  mutate(country = str_replace(country, "^USA!", "USA")) %>%
+  mutate(country = str_replace(country, "^USA USA USA$", "USA")) %>%
+  mutate(country = str_replace(country, "[U][s][a]", "USA")) %>%
+  mutate(country = str_replace(country, "^Usa!$", "USA")) %>%
+  mutate(country = str_replace(country, "[U][.][S][.][A][.]", "USA")) %>%
+  mutate(country = str_replace(country, "^United States of America$", "USA")) %>%
+  mutate(country = str_replace(country, "[uU][n][i][t][e][d][ ][Ss][t][a][t][e][s]", "USA")) %>%
+  mutate(country = str_replace(country, "^Murica$", "USA")) %>%
+  mutate(country = str_replace(country, "^U.S.$", "USA")) %>%
+  mutate(country = str_replace(country, "^USA USA! USA!", "USA"))
+
+clean_2017 <- clean_2017 %>%
+  add_column(brach_products_not_including_candy_corn = NA) %>%
+  add_column(bubble_gum = NA) %>%
+  add_column(hersheys_kissables = NA) %>%
+  add_column(lapel_pins = NA) %>%
+  add_column(runts = NA) %>%
+  add_column(mint_leaves = NA) %>%
+  add_column(mint_m_ms = NA) %>%
+  add_column(ribbon_candy = NA) %>%
+  add_column(peanut_butter_jars = NA) %>%
+  add_column(peanut_butter_bars = NA) %>%
+  add_column(peterson_brand_sidewalk_chalk = NA)
 
 
-country names; ensure all countries are capitalised.
+# Joining ---------
 
-# Change all versions of USA to USA, and similar for other countries.
+joined_candy <- bind_rows(clean_2015, clean_2016, clean_2017)
 
-# Remove incorrect strings. 
-
-# Clean state column, i.e. ensure all strings are correct.
-
-# Change all USA and canadian states to same format, e.g. TN, USA
+# Saving ---
+save to csv

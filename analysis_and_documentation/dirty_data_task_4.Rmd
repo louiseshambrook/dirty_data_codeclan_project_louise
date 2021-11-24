@@ -9,6 +9,9 @@ NOTE TO MYSELF - WHEN I PICK UP ON TUESDAY - MOVE NOTES OVER FROM HERE to R SCRI
 - Assertive programming
 - Unit tests
 
+- include documentation for all decisions, e.g. why dropping certain columns
+
+
 
 # Dirty Data - Louise Shambrook
 ## 26/11/2021
@@ -81,46 +84,7 @@ candy_2016 <- read_xlsx(here::here("raw_data/boing-boing-candy-2016.xlsx"))
 candy_2017 <- read_xlsx(here::here("raw_data/boing-boing-candy-2017.xlsx"))
 ```
 
-```{r}
-# 2015 CLEANING  --------------------------------------------------------------
-
-
-# 2016 CLEANING ---------------------------------------------------------------
-
-
-# Change all versions of USA to USA, and similar for other countries.
-
-# Remove incorrect strings. 
-
-# Clean state column, i.e. ensure all strings are correct.
-
-# Change all USA and canadian states to same format, e.g. TN, USA
-
-
-# 2017 Cleaning --------------------------------------------------------------
-
-
-# reassigning the internal_id column to 2017
-
-# Cleaning the age column
-# There are 2 answers which indicate a specific answer, e.g. "40. Deal with it".
-# There are 5 which reference a vague answer, e.g. "50's". It is not
-# reasonable to assume their answer - if there is time, I will go back and
-# replace these with "vague" (or similar). Then there are the outright "invalid"
-# answers, e.g. "old enough" which do not reference an age. These are NA.
-
-
-# Clean country names; ensure all countries are capitalised.
-
-# Change all versions of USA to USA, and similar for other countries.
-
-# Remove incorrect strings. 
-
-# Clean state column, i.e. ensure all strings are correct.
-
-# Change all USA and canadian states to same format, e.g. TN, USA
-```
-
+2015 Cleaning
 ```{r}
 clean_2015 <- clean_names(candy_2015)
 clean_2015 <- clean_2015 %>%
@@ -198,7 +162,6 @@ clean_2015 <- clean_2015 %>%
   mutate(age = na_if(age, 9.70000e+01)) %>%
   mutate(age = na_if(age, 4.90000e+02)) %>%
   mutate(age = na_if(age, 350))
-
 ```
 
 ```{r}
@@ -310,7 +273,6 @@ clean_2017 <- clean_2017 %>%
 clean_2017 <- clean_2017 %>% 
   rename_with(.cols = starts_with("q6_"), .fn = ~str_replace(.x, "q6_", ""))
 
-
 clean_2017 <- clean_2017 %>%
   mutate(country = str_replace(country, "[u][sS][aA]", "USA")) %>%
   mutate(country = str_replace(country, "[uU][s]", "USA")) %>%
@@ -329,10 +291,20 @@ clean_2017 <- clean_2017 %>%
 
 ```
 
+Beginning to join the dataframes - examine the difference between frames
 ```{r}
-# Looking at the differences between the frames - first step to joining
+setdiff(names(clean_2015), names(clean_2016))
+setdiff(names(clean_2015), names(clean_2017))
+
+setdiff(names(clean_2016), names(clean_2015))
+setdiff(names(clean_2016), names(clean_2017))
+
 setdiff(names(clean_2017), names(clean_2015))
-                                                              
+setdiff(names(clean_2017), names(clean_2016))
+
+
+# Adding/renaming columns to the 2015 dataset
+
 clean_2015 <- clean_2015 %>%
   rename("100_grand_bar" = x100_grand_bar,
   anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes = 
@@ -367,13 +339,7 @@ clean_2015 <- clean_2015 %>%
   add_column(whatchamacallit_bars = NA) %>%
   add_column(dove_bars = NA)
 
-names(clean_2017)
-head(clean_2017)
-```
-
-```{r}
-setdiff(names(clean_2017), names(clean_2016))
-#whats in x that's NOT in y
+# Adding/renaming the 2016 dataset
 
 clean_2016 <- clean_2016 %>%
   rename("100_grand_bar" = x100_grand_bar,
@@ -400,6 +366,13 @@ clean_2016 <- clean_2016 %>%
   add_column(peanut_butter_bars = NA) %>%
   add_column(peterson_brand_sidewalk_chalk = NA)
 
+clean_2016 <- clean_2016 %>%
+  select(-mary_janes) %>%
+  select(-"third_party_m_ms") %>%
+  select(-"person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes")
+
+# Adding/renaming the 2017 dataset
+
 clean_2017 <- clean_2017 %>%
   add_column(brach_products_not_including_candy_corn = NA) %>%
   add_column(bubble_gum = NA) %>%
@@ -413,32 +386,8 @@ clean_2017 <- clean_2017 %>%
   add_column(peanut_butter_bars = NA) %>%
   add_column(peterson_brand_sidewalk_chalk = NA)
 
-clean_2016 <- clean_2016 %>%
-  select(-mary_janes) 
+# Setting the order
 
-clean_2016 <- clean_2016 %>%
-  select(-"third_party_m_ms") %>%
-  select(-"person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes")
-
-# LOOK AT THIS TONIGHT AT FIX THIS PROBLEM
-
-```
-
-```{r}
-setdiff(names(clean_2015), names(clean_2016))
-setdiff(names(clean_2015), names(clean_2017))
-# all clear
-
-setdiff(names(clean_2016), names(clean_2015))
-setdiff(names(clean_2016), names(clean_2017))
-
-setdiff(names(clean_2017), names(clean_2015))
-setdiff(names(clean_2017), names(clean_2016))
-# all clear
-```
-
-```{r}
-#setting the order
 clean_2015 <- clean_2015 %>%
   select(year, age, going_out, gender, country, state, "100_grand_bar",
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
@@ -481,7 +430,7 @@ clean_2016 <- clean_2016 %>%
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
          any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
          bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
-        butterfinger, cadbury_creme_eggs, candy_corn,
+         butterfinger, cadbury_creme_eggs, candy_corn,
         candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants,
         caramellos, cash_or_other_forms_of_legal_tender, chardonnay, 
         chick_o_sticks_we_don_t_know_what_that_is, chiclets, coffee_crisp,
@@ -512,11 +461,10 @@ clean_2016 <- clean_2016 %>%
         bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
         mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
         peterson_brand_sidewalk_chalk)
-names(clean_2017)
 
- 
 ```
 
+Joining the dataset
 ```{r}
 joined_candy <- bind_rows(clean_2015, clean_2016, clean_2017)
 ```
