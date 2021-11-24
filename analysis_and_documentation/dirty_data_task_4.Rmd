@@ -276,22 +276,25 @@ clean_2016 <- clean_2016 %>%
 
 ```{r}
 clean_2017 <- clean_names(candy_2017)
+
+clean_2017 <- clean_2017 %>%
+  rename(year = internal_id)
 clean_2017$year <- 2017
+
+clean_2017 <- clean_2017 %>%
+  select(-110, -111, -112, -113, -114, -115, -116, -117, -118, -119, -120)
+
 clean_2017 <- clean_2017 %>%
   rename(going_out = q1_going_out,
          gender = q2_gender,
           age = q3_age,
           country = q4_country,
           state = q5_state_province_county_etc)
-clean_2017 <- clean_2017 %>%
-  select(-110, -111, -112, -113, -114, -115, -116, -117, -118, -119, -120, -121)
-clean_2017 <- clean_2017 %>%
-  rename(year = internal_id)
 clean_2017$age[clean_2017$age == "sixty-nine"] <- 69
 clean_2017$age[clean_2017$age == "46 Halloweens"] <- 46
 clean_2017 <- clean_2017 %>%
   relocate(age, .after = year)
-clean_2017$internal_id <- 2017
+
 clean_2017 <- clean_2017 %>%
   transform(age = as.numeric(age))
 
@@ -328,59 +331,195 @@ clean_2017 <- clean_2017 %>%
 
 ```{r}
 # Looking at the differences between the frames - first step to joining
+setdiff(names(clean_2017), names(clean_2015))
+                                                              
+clean_2015 <- clean_2015 %>%
+  rename("100_grand_bar" = x100_grand_bar,
+  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes = 
+    anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
+  bonkers_the_candy = bonkers,
+  boxo_raisins = box_o_raisins,
+  hersheys_dark_chocolate = dark_chocolate_hershey,
+  hershey_s_milk_chocolate = hersheys_milk_chocolate,
+  licorice_yes_black = licorice,
+  sweetums_a_friend_to_diabetes = sweetums)
 
-#NOTE TO SELF - stick with 2015 naming
+clean_2015 <- clean_2015 %>%
+  add_column(bonkers_the_board_game = NA) %>%
+  add_column(chardonnay = NA) %>%
+  add_column(coffee_crisp = NA) %>%
+  add_column(hersheys_kisses = NA) %>%
+  add_column(mike_and_ike = NA) %>%
+  add_column(blue_m_ms = NA) %>%
+  add_column(red_m_ms = NA) %>%
+  add_column(green_party_m_ms = NA) %>%
+  add_column(independent_m_ms = NA) %>%
+  add_column(abstained_from_m_ming = NA) %>%
+  add_column(mr_goodbar = NA) %>%
+  add_column(peeps = NA) %>%
+  add_column(real_housewives_of_orange_county_season_9_blue_ray = NA) %>%
+  add_column(reeses_pieces = NA) %>%
+  add_column(sandwich_sized_bags_filled_with_boo_berry_crunch = NA) %>%
+  add_column(sourpatch_kids_i_e_abominations_of_nature = NA) %>%
+  add_column(sweet_tarts = NA) %>%
+  add_column(take_5 = NA) %>%
+  add_column(tic_tacs = NA) %>%
+  add_column(whatchamacallit_bars = NA) %>%
+  add_column(dove_bars = NA)
 
+names(clean_2017)
+head(clean_2017)
+```
 
-
-setdiff(names(clean_2016), names(clean_2015))
+```{r}
+setdiff(names(clean_2017), names(clean_2016))
 #whats in x that's NOT in y
 
-# [1] "bonkers_the_candy"                                                                   
-#  [2] "bonkers_the_board_game"                                                              
-#  [4] "chardonnay"                                                                          
-#  [5] "coffee_crisp"                                                                        
-#  [6] "dove_bars"                                                                           
-#  [7] "hersheys_dark_chocolate"                                                             
-#  [8] "hersheys_kisses"                                                                     
-#  [9] "licorice_yes_black"                                                                  
-# [10] "mike_and_ike"                                                                        
-# [11] "blue_m_ms"                                                                           
-# [12] "red_m_ms"                                                                            
-# [13] "third_party_m_ms"                                                                    
-# [14] "mr_goodbar"                                                                          
-# [15] "peeps"                                                                               
-# [16] "person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes"
-# [17] "reeses_pieces"                                                                       
-# [18] "sourpatch_kids_i_e_abominations_of_nature"                                           
-# [19] "sweet_tarts"                                                                         
-# [20] "sweetums_a_friend_to_diabetes"                                                       
-# [21] "tic_tacs"                                                                            
-# [22] "whatchamacallit_bars"                                                                
-
-2015 = 2016
+clean_2016 <- clean_2016 %>%
+  rename("100_grand_bar" = x100_grand_bar,
+         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes =
+           anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
+           hershey_s_milk_chocolate = hersheys_milk_chocolate)
 
 clean_2016 <- clean_2016 %>%
-  rename(box_o_raisins = boxo_raisins,
-         = ,
-         = ,
-         = ,
-         = ,
-         
-         )
+  add_column(green_party_m_ms = NA) %>%
+  add_column(independent_m_ms = NA) %>%    
+  add_column(abstained_from_m_ming = NA) %>%    
+  add_column(real_housewives_of_orange_county_season_9_blue_ray = NA) %>%    
+  add_column(sandwich_sized_bags_filled_with_boo_berry_crunch = NA) %>%    
+  add_column(take_5 = NA) %>%
+  add_column(brach_products_not_including_candy_corn = NA) %>%
+  add_column(bubble_gum = NA) %>%
+  add_column(hersheys_kissables = NA) %>%
+  add_column(lapel_pins = NA) %>%
+  add_column(runts = NA) %>%
+  add_column(mint_leaves = NA) %>%
+  add_column(mint_m_ms = NA) %>%
+  add_column(ribbon_candy = NA) %>%
+  add_column(peanut_butter_jars = NA) %>%
+  add_column(peanut_butter_bars = NA) %>%
+  add_column(peterson_brand_sidewalk_chalk = NA)
 
+clean_2017 <- clean_2017 %>%
+  add_column(brach_products_not_including_candy_corn = NA) %>%
+  add_column(bubble_gum = NA) %>%
+  add_column(hersheys_kissables = NA) %>%
+  add_column(lapel_pins = NA) %>%
+  add_column(runts = NA) %>%
+  add_column(mint_leaves = NA) %>%
+  add_column(mint_m_ms = NA) %>%
+  add_column(ribbon_candy = NA) %>%
+  add_column(peanut_butter_jars = NA) %>%
+  add_column(peanut_butter_bars = NA) %>%
+  add_column(peterson_brand_sidewalk_chalk = NA)
 
-names(clean_2015)
-names(clean_2016)
+clean_2016 <- clean_2016 %>%
+  select(-mary_janes) 
 
-         
-         
-         
-         
-setdiff(names(clean_2016), names(clean_2017))
+clean_2016 <- clean_2016 %>%
+  select(-"third_party_m_ms") %>%
+  select(-"person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes")
+
+# LOOK AT THIS TONIGHT AT FIX THIS PROBLEM
 
 ```
 
+```{r}
+setdiff(names(clean_2015), names(clean_2016))
+setdiff(names(clean_2015), names(clean_2017))
+# all clear
+
+setdiff(names(clean_2016), names(clean_2015))
+setdiff(names(clean_2016), names(clean_2017))
+
+setdiff(names(clean_2017), names(clean_2015))
+setdiff(names(clean_2017), names(clean_2016))
+# all clear
+```
+
+```{r}
+#setting the order
+clean_2015 <- clean_2015 %>%
+  select(year, age, going_out, gender, country, state, "100_grand_bar",
+         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+         any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
+         bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+        butterfinger, cadbury_creme_eggs, candy_corn,
+        candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants,
+        caramellos, cash_or_other_forms_of_legal_tender, chardonnay, 
+        chick_o_sticks_we_don_t_know_what_that_is, chiclets, coffee_crisp,
+        creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, 
+        dove_bars, fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,
+        goo_goo_clusters, good_n_plenty, gum_from_baseball_cards,
+        gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+        hersheys_dark_chocolate, hershey_s_milk_chocolate, hersheys_kisses,
+        hugs_actual_physical_hugs, jolly_rancher_bad_flavor,
+        jolly_ranchers_good_flavor, joy_joy_mit_iodine, junior_mints,
+        senior_mints, kale_smoothie, kinder_happy_hippo, kit_kat, laffy_taffy,
+        lemon_heads, licorice_not_black, licorice_yes_black, lindt_truffle,
+        lollipops, mars, maynards, mike_and_ike, milk_duds, milky_way,
+        regular_m_ms, peanut_m_m_s, blue_m_ms, red_m_ms, green_party_m_ms,
+        independent_m_ms, abstained_from_m_ming, minibags_of_chips, mint_kisses,
+        mint_juleps, mr_goodbar, necco_wafers, nerds, nestle_crunch, nown_laters,
+        peeps, pencils, pixy_stix, real_housewives_of_orange_county_season_9_blue_ray,
+        reese_s_peanut_butter_cups, reeses_pieces, reggie_jackson_bar, rolos,
+        sandwich_sized_bags_filled_with_boo_berry_crunch, skittles,
+        smarties_american, smarties_commonwealth, snickers,
+        sourpatch_kids_i_e_abominations_of_nature, spotted_dick, starburst,
+        sweet_tarts, swedish_fish, sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+        those_odd_marshmallow_circus_peanut_things, three_musketeers,
+        tolberone_something_or_other, trail_mix, twix,
+        vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+        vicodin, whatchamacallit_bars, white_bread, whole_wheat_anything,
+        york_peppermint_patties, brach_products_not_including_candy_corn,
+        bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
+        mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
+        peterson_brand_sidewalk_chalk)
+
+clean_2016 <- clean_2016 %>%
+  select(year, age, going_out, gender, country, state, "100_grand_bar",
+         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+         any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
+         bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+        butterfinger, cadbury_creme_eggs, candy_corn,
+        candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants,
+        caramellos, cash_or_other_forms_of_legal_tender, chardonnay, 
+        chick_o_sticks_we_don_t_know_what_that_is, chiclets, coffee_crisp,
+        creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, 
+        dove_bars, fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,
+        goo_goo_clusters, good_n_plenty, gum_from_baseball_cards,
+        gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+        hersheys_dark_chocolate, hershey_s_milk_chocolate, hersheys_kisses,
+        hugs_actual_physical_hugs, jolly_rancher_bad_flavor,
+        jolly_ranchers_good_flavor, joy_joy_mit_iodine, junior_mints,
+        senior_mints, kale_smoothie, kinder_happy_hippo, kit_kat, laffy_taffy,
+        lemon_heads, licorice_not_black, licorice_yes_black, lindt_truffle,
+        lollipops, mars, maynards, mike_and_ike, milk_duds, milky_way,
+        regular_m_ms, peanut_m_m_s, blue_m_ms, red_m_ms, green_party_m_ms,
+        independent_m_ms, abstained_from_m_ming, minibags_of_chips, mint_kisses,
+        mint_juleps, mr_goodbar, necco_wafers, nerds, nestle_crunch, nown_laters,
+        peeps, pencils, pixy_stix, real_housewives_of_orange_county_season_9_blue_ray,
+        reese_s_peanut_butter_cups, reeses_pieces, reggie_jackson_bar, rolos,
+        sandwich_sized_bags_filled_with_boo_berry_crunch, skittles,
+        smarties_american, smarties_commonwealth, snickers,
+        sourpatch_kids_i_e_abominations_of_nature, spotted_dick, starburst,
+        sweet_tarts, swedish_fish, sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+        those_odd_marshmallow_circus_peanut_things, three_musketeers,
+        tolberone_something_or_other, trail_mix, twix,
+        vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+        vicodin, whatchamacallit_bars, white_bread, whole_wheat_anything,
+        york_peppermint_patties, brach_products_not_including_candy_corn,
+        bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
+        mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
+        peterson_brand_sidewalk_chalk)
+names(clean_2017)
+
+ 
+```
+
+```{r}
+joined_candy <- bind_rows(clean_2015, clean_2016, clean_2017)
+```
 
 What is the total number of candy ratings given across the three years.
 (Number of candy ratings, not the number of raters. Don’t count missing values)
