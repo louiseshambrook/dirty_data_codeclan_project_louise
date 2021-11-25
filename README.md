@@ -33,22 +33,22 @@ For all 3 datasets:
 - Joining the 3 years together by using bind_rows
 - Saving to csv.
 
-- For some of the analysis questions, the dataframe has been manipulated to change JOY, DESPAIR, and MEH to +1, -1 and 0 respectively.
-
 ## Analysis answers
-- What is the total number of candy ratings given across the three years.
+All the set questions were completed.
+- What is the total number of candy ratings given across the three years. 
 (Number of candy ratings, not the number of raters. Don’t count missing values)
-- What was the average age of people who are going out trick or treating?
-- What was the average age of people who are not going trick or treating?
-- How many people rated Starburst as despair?
-- For each of joy, despair and meh, which candy bar received the most of these ratings?
+- What was the average age of people who are going out trick or treating? (34.8465)
+- What was the average age of people who are not going trick or treating? (39.06105)
+- For each of joy, despair and meh, which candy bar received the most of these ratings? (JOY, any_full_sized_candy_bar; MEH, lollipops; DESPAIR, broken_glow_stick)
+- How many people rated Starburst as despair? (1990)
 
 For the following questions, a dataframe was ceated where JOY, DESPAIR, and MEH to +1, -1 and 0 were rated as respectively.
 - What was the most popular candy bar by this rating system for each gender in
-the dataset ?
+the dataset ? (Female, any_full_sized_candy_bar; Male, hundred_grand_bar)
+- What was the most popular candy bar in each year? (2015, any_full_sized_candy_bar; 2016, any_full_sized_candy_bar; 2017, any_full_sized_candy_bar)
 - What was the most popular candy bar by this rating for people in US, Canada,
-UK, and all other countries?
-- What was the most popular candy bar in each year?
+UK, and all other countries? (USA, any_full_sized_candy_bar; Canada, any_full_sized_candy_bar; UK, cash_or_other_forms_of_legal_tender; Other countries, any_full_sized_candy_bar)
+
 
 ## Other observations
 - The research that the original researchers have done on whether a measure of character has an impact on their candy rating is interesting.
