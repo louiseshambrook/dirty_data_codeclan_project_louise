@@ -9,6 +9,7 @@ library(janitor)
 library(stringr)
 library(tidyverse)
 library(assertr)
+library(Hmisc)
 
 # Loading datasets ---------------------------
 candy_2015 <- read_xlsx(here::here("raw_data/boing-boing-candy-2015.xlsx"))
@@ -101,7 +102,7 @@ clean_2015 <- clean_2015 %>%
 # analysis. 
 
 clean_2015 <- clean_2015 %>%
-  rename(hundred_grand_bar= x100_grand_bar,
+  rename(hundred_grand_bar = x100_grand_bar,
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes = 
            anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
          bonkers_the_candy = bonkers,
@@ -141,7 +142,7 @@ clean_2015 <- clean_2015 %>%
 # the 2016 and 2017 datasets for joining.
 
 clean_2015 <- clean_2015 %>%
-  select(year, age, going_out, gender, country, state, "100_grand_bar",
+  select(year, age, going_out, gender, country, state, hundred_grand_bar,
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
          any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
          bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
@@ -176,24 +177,8 @@ clean_2015 <- clean_2015 %>%
          bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
          mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
          peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
-         person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes))
+         person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes)
 # The order of the columns has been set, so that the rows will bind correctly.
-
-## THIS IS MY ATTEMPT AT ASSERTIVE PROGRAMMING - ASK SOMEONE LATER
-# clean_data_2015_age <- function(age_people) {
-#   #check age
-#   age_people %>%
-#     verify(age >0 & age <= 80)
-#   
-#   #average_age
-#   average_age <- 
-#     age_people %>%
-#     summarise(
-#       mean_age = mean(age)
-#     )
-#   return(list(mean_age))
-# }    
-#assertive programming function  
 
 # 2016 Dataset Cleaning --------------------------------------------------------
 
@@ -306,7 +291,7 @@ clean_2016 <- clean_2016 %>%
 # accurate analysis can be completed
 
 clean_2016 <- clean_2016 %>%
-  rename("100_grand_bar" = x100_grand_bar,
+  rename(hundred_grand_bar = x100_grand_bar,
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes =
            anonymous_brown_globs_that_come_in_black_and_orange_wrappers)
 # The above columns have been renamed to ensure they align with the 2017
@@ -334,18 +319,7 @@ clean_2016 <- clean_2016 %>%
 # the 2015 and 2017 datasets for joining.
 
 clean_2016 <- clean_2016 %>%
-  select(-mary_janes) %>%
-  select(-"third_party_m_ms") %>%
-  select(-"person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes")
-# The above columns have been removed to ensure the dataframe aligns.
-
-
-# NOTE - this is a BUG. FIX
-
-
-
-clean_2016 <- clean_2016 %>%
-  select(year, age, going_out, gender, country, state, "100_grand_bar",
+  select(year, age, going_out, gender, country, state, hundred_grand_bar,
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
          any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
          bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
@@ -380,11 +354,8 @@ clean_2016 <- clean_2016 %>%
          bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
          mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
          peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
-         person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes))
+         person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes)
 # The order of the columns has been set, so that the rows will bind correctly.
-
-# clean_2016 <- clean_2016 %>%
-#   mutate(country = str_to_title())
 
 # 2017 Cleaning ----------------------------------------------------------------
 
@@ -396,8 +367,9 @@ clean_2017 <- clean_2017 %>%
          gender = q2_gender,
          age = q3_age,
          country = q4_country,
-         state = q5_state_province_county_etc
+         state = q5_state_province_county_etc,
          year = internal_id)
+
 # Renaming select variables to better identify their content
 
 clean_2017 <- clean_2017 %>%
@@ -447,6 +419,9 @@ clean_2017 <- clean_2017 %>%
   rename_with(.cols = starts_with("q6_"), .fn = ~str_replace(.x, "q6_", ""))
 # In this dataset, the survey columns start with q6-, which has been dropped
 # here.
+
+clean_2017 <- clean_2017 %>%
+  rename(hundred_grand_bar = "100_grand_bar")
 
 clean_2017 <- clean_2017 %>%
   mutate(country = na_if(country, "35")) %>%
@@ -534,9 +509,10 @@ clean_2017 <- clean_2017 %>%
 # The above columns have been added to ensure the dataframe aligns with
 # the 2015 and 2016 datasets for joining.
 
-# Joining ---------
+# Joining ----------------------------------------------------------------------
 
 joined_candy <- bind_rows(clean_2015, clean_2016, clean_2017)
 
-# Saving ---
-save to csv
+# Saving -----------------------------------------------------------------------
+  write_csv(joined_candy, file = "clean_data/joined_candy")
+

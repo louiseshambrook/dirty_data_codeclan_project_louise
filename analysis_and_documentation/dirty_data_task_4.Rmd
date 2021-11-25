@@ -2,536 +2,230 @@
 title: "R Notebook"
 output: html_notebook
 ---
-## TO DO
-- do 2017 documentation 
-- check ages for 2016 and fix coding / documentation
-- fix regex for USA
-- make regex for Canada
-- make regex for UK
-- remove "other" names from countries
-- fix bug with 2016 dataframe (picking up 3 additional columns)
-
 # Dirty Data - Louise Shambrook
 ## 26/11/2021
 
-### - Required libraries
-```{r}
-library(readr)
-library(readxl)
-library(dplyr)
-library(here)
-library(janitor)
-library(stringr)
-library(tidyverse)
-library(assertr)
-#calling libraries
-```
-
-## Points to include in final report:
-- A brief introduction to the dataset
-- A list of any assumptions you have made
-- The steps you took to clean the data (you don’t need to write out in detail every step, but a combination of commented code chunks with surrounding overall explanations would be great).
-- The answers to the questions presented in the task brief
-- Any other interesting analyses or conclusions you come across.
-
-# Final report (draft)
-
 ### Brief Introduction to the dataset
-In 2006, David Ng and Ben Cohen began to rank candy based on their location
-in geological strata, for trick or treating purposes. This has developed over
-the years into a "not quite social science legit survey". As of 2019, this has 
-become a way of measuring "net feelies" when trick or treating, for a wide range
-of candies, which critically includes items such as hugs, glow sticks and bread.
-
-Source: https://boingboing.net/author/davidng2
+This dataset is based on data from David Ng and Ben Cohen. They have previously ranked candy based on their location in geological strata, for trick or treating purposes. As of 2019, this has become a way of measuring "net feelies" when trick or treating, for a wide range of candies, which critically includes items such as hugs, glow sticks and bread. Source: https://boingboing.net/author/davidng2
 
 ### Brief introductions to assumptions
-- I intially assumed the dataset was complete, i.e. that the columns were correct
-(should be there).
-- As I began to dig in to it and opened it in excel, I learned that some of
-these could be dropped.
-- I then over-corrected and tried to drop too many.
-- I then began to research the background of the dataset, and found that only
-some of these would need to be dropped.
-- I assume that many of the NA's can be dropped/changed without causing many problems.
-- I assume that respondents will generally only be from the US and Canada.
-- I assume that age will only be given in whole numbers.
-- That the "random" columns at the end, were indeed random, however upon further
-research and reading, I learned that these are indicators for charactor and that
-this has an impact on the ratings. I have then begun to think about how I can 
-change my data analysis to reflect this, as the time constraints of the project
-means that realistically means I will not be able to include all of them.
-Source: https://boingboing.net/2015/10/31/the-candy-hierarchy-2015-your.html
-Table 1B. 
+- I intially assumed the dataset was complete, i.e. that the columns were correct (should be there).
+- I later assummed some columns could/should be dropped, and then attempted to delete too many.
+- I assumed that the columns should remain intact with their data, across the 3 years.
+- I assumed that respondents will generally only be from the US and Canada.
+- I assumed that age will only be given in whole numbers.
+- I assumed that the joined table did not / could not be pivoted, due to the large amount of data collected.
 
 ### Steps to clean the data
-- Changing names of columns
-- Changing timestamp of 2015 and 2016
-- Changing column type of age
+- Using janitor to clean the column names.
+- Renaming select variables to ensure that their data could be identified
+- Relocating columns
+- Changing the timestamp to the year.
+- Changing inaccurate age responses to either the given answer (e.g. "40, deal" to 40, or dropping).
+- Transforming the age column to numeric.
+- Adding missing columns, e.g. gender, or missing candy columns
+- Dropping columns, e.g. the columns which surveyed character, as that would not be examined in this analysis
+- Renaming columns to align the names across the years
+- Setting the order to align the order across the years
+- Joining the 3 years together by using bind_rows
+- Saving to csv.
+- For some of the analysis questions, the dataframe has been manipulated to change JOY, DESPAIR, and MEH to +1, -1 and 0 respectively.
 
-## Analysis
-
-
+## Reading in the cleaned data
 ```{r}
-candy_2015 <- read_xlsx(here::here("raw_data/boing-boing-candy-2015.xlsx"))
-candy_2016 <- read_xlsx(here::here("raw_data/boing-boing-candy-2016.xlsx"))
-candy_2017 <- read_xlsx(here::here("raw_data/boing-boing-candy-2017.xlsx"))
-```
+# reading in cleaned data
 
-Code to load the frames
-```{r}
-clean_2015 <- clean_names(candy_2015)
-clean_2015 <- clean_2015 %>%
-  rename(age = how_old_are_you,
-         going_out = are_you_going_actually_going_trick_or_treating_yourself,
-         year = timestamp,
-         hersheys_kissables= hershey_s_kissables,
-         hersheys_milk_chocolate = hershey_s_milk_chocolate,
-         remarks_or_comments = please_leave_any_remarks_or_comments_regarding_your_choices,
-         items_not_included_joy = please_list_any_items_not_included_above_that_give_you_joy,
-         items_not_included_despair = please_list_any_items_not_included_above_that_give_you_despair
-  )
-clean_2015 <- clean_2015 %>%
-  relocate(necco_wafers, .after = york_peppermint_patties)
-clean_2015$year <- 2015
-clean_2015$age[clean_2015$age == "45, but the 8-year-old Huntress and
-                 bediapered Unicorn give me political cover and social
-                 respectability.  However, I WILL eat more than they do
-                 combined."] <- 45
-clean_2015$age[clean_2015$age == "37 (I'm taking a child)"] <- 37
-clean_2015$age[clean_2015$age == "Good Lord!  I'm 43!"] <- 43
-clean_2015$age[clean_2015$age == "46:"] <- 46
-clean_2015$age[clean_2015$age == "40. Deal with it. "] <- 40
-clean_2015$age[clean_2015$age == "37,"] <- 37
-clean_2015$age[clean_2015$age == "50 (despair)"] <- 50
-clean_2015$age[clean_2015$age == "27^"] <- 27
-clean_2015$age[clean_2015$age == "50, taking a 13 year old."] <- 50
-clean_2015$age[clean_2015$age == "42 - I'm taking my kid"] <- 42
-clean_2015$age[clean_2015$age == "42 - I'm taking my kid"] <- 42
-clean_2015$age[clean_2015$age == "50t"] <- 50                 
-clean_2015 <- clean_2015 %>%
-  transform(age = as.numeric(age))
-clean_2015 <- clean_2015 %>%
-  add_column(gender = NA, .after = "going_out") %>%
-  add_column(country = NA, .after = "gender") %>%
-  add_column(state = NA, .after = "country")
-clean_2015 <- clean_2015 %>%
-  select(-101, -102, -103, -104, -105, -106, -107, -108, -109, -110, -111, 
-         -112, -113, -114, -115, -116, -117, -118, -119, -120, -121, -122,
-         -123, -124, -125, -126, -127)
-clean_2015 <- clean_2015 %>%
-  mutate(age = na_if(age, 1.23000e+02)) %>%
-  mutate(age = na_if(age, 9.00000e+22)) %>%
-  mutate(age = na_if(age, 1.88000e+03)) %>%
-  mutate(age = na_if(age, 2.00587e+05)) %>%
-  mutate(age = na_if(age, 9.90000e+01)) %>%
-  mutate(age = na_if(age, 1.00000e+02)) %>%
-  mutate(age = na_if(age, 1.15000e+02)) %>%
-  mutate(age = na_if(age, 3.88000e+02)) %>%
-  mutate(age = na_if(age, 1.20000e+02)) %>%
-  mutate(age = na_if(age, 1.08000e+02)) %>%
-  mutate(age = na_if(age, Inf)) %>%
-  mutate(age = na_if(age, 9.90000e+01)) %>%
-  mutate(age = na_if(age, 2.00000e+03)) %>%
-  mutate(age = na_if(age, 3.50000e+02)) %>%
-  mutate(age = na_if(age, 4.00000e+02)) %>%
-  mutate(age = na_if(age, 8.50000e+01)) %>%
-  mutate(age = na_if(age, 9.70000e+01)) %>%
-  mutate(age = na_if(age, 4.90000e+02)) %>%
-  mutate(age = na_if(age, 350))
-
-clean_2016 <- clean_names(candy_2016)
-clean_2016 <- clean_2016 %>%
-  rename(age = how_old_are_you,
-         going_out = are_you_going_actually_going_trick_or_treating_yourself,
-         year = timestamp,
-         gender = your_gender,
-         country = which_country_do_you_live_in,
-         state = which_state_province_county_do_you_live_in,
-         hersheys_milk_chocolate = hershey_s_milk_chocolate,
-  )
-clean_2016 <- clean_2016 %>%
-  transform(age = as.numeric(age))
-clean_2016$year <- 2016
-clean_2016 <- clean_2016 %>%
-  relocate(age, .after = year)
-clean_2016 <- clean_2016 %>%
-  select(-107, -108, -109, -110, -111, 
-         -112, -113, -114, -115, -116, -117, -118, -119, -120, -121, -122,
-         -123)
-clean_2016 <- clean_2016 %>%
-  mutate(country = na_if(country, "A tropical island south of the equator")) %>%
-  mutate(country = na_if(country, "Neverland")) %>%
-  mutate(country = na_if(country, "51.0")) %>%
-  mutate(country = na_if(country, "47.0")) %>%
-  mutate(country = na_if(country, "54.0")) %>%
-  mutate(country = na_if(country, "44.0")) %>%
-  mutate(country = na_if(country, "45.0")) %>%
-  mutate(country = na_if(country, "30.0")) %>%
-  mutate(country = na_if(country, "one of the best ones")) %>%
-  mutate(country = na_if(country, "there isn't one for old men")) %>%
-  mutate(country = na_if(country, "god's country")) %>%
-  mutate(country = na_if(country, "see above")) %>%
-  mutate(country = na_if(country, "45.0")) %>%
-  mutate(country = na_if(country, "this one")) %>%
-  mutate(country = na_if(country, "somewhere")) %>%
-  mutate(country = na_if(country, "Somewhere")) %>%
-  mutate(country = na_if(country, "EUA")) %>%
-  mutate(country = na_if(country, "Cascadia")) %>%
-  mutate(country = na_if(country, "Trumpistan")) %>%
-  mutate(country = na_if(country, "See above")) %>%
-  mutate(country = na_if(country, "Not the USA or Canada")) %>%
-  mutate(country = na_if(country, "The republic of Cascadia")) %>%
-  mutate(country = na_if(country, "Denial"))
-clean_2016 <- clean_2016 %>%
-  mutate(country = str_replace(country, "^usa$|^US$|^uSA$|^U.S.A$|^USA!$|^Us$|^Murica$|^USA! USA! USA!$|
-                               ^the best one - usa$|^united states$|^United States of America$|^us$|
-                               ^U.S.A.$|^America$|^The Yoo Ess of Aaayyyyyy$|
-                               ^Units States$|^United states$|
-                               ^USA!!!!!!$|^USSA$|^U.S.A.$|^Usa$|^U.S.A.$
-                               |^Units States$|^united states of america$
-                               |^Sub-Canadian North America... 'Merica$", "USA")) %>%
-  mutate(country = str_replace(country, "^United States$|
-                               ^USA (I think but it's an election year so who can really tell)$
-                               |^USA USA USA$|^U.S.$|^u.s.$
-                               |^united states of america$|^USA!!!!!!$
-                               |^USA! USA!$|^United Sates$|^UNited States$
-                               |^Merica$|^UNited States$|^america$
-                               |^United State$", "USA"))
-clean_2016 <- clean_2016 %>%
-  mutate(country = str_replace(country, "^England$|^United Kingdom$|^uk$|
-                               ^United Kindom$|^england$", "UK"))
-clean_2016 <- clean_2016 %>%
-  mutate(country = str_replace(country, "^canada$", "Canada")) %>%
-  mutate(country = str_replace(country, "^france$" , "France")) %>%
-  mutate(country = str_replace(country, "^belgium$", "Belgium")) %>%
-  mutate(country = str_replace(country, "^croatia$", "Croatia")) %>%
-  mutate(country = str_replace(country, "^españa$", "Spain")) %>%
-  mutate(country = str_replace(country, "^sweden$", "Sweden")) %>%
-  mutate(country = str_replace(country, "^germany$" , "Germany")) %>%
-  mutate(country = str_replace(country, "^netherlands$|^The Netherlands$",
-                               "Netherlands")) %>%
-  mutate(country = str_replace(country, "^kenya$", "Kenya")) %>%
-  mutate(country = str_replace(country, "^hungary$", "Hungary"))
-clean_2016 <- clean_2016 %>%
-  mutate(age = na_if(age, 8.10e+01)) %>%
-  mutate(age = na_if(age, 1.00e+18)) %>%
-  mutate(age = na_if(age, 8.20e+01)) %>%
-  mutate(age = na_if(age, 1.42e+02))
-
-
-clean_2017 <- clean_names(candy_2017)
-clean_2017 <- clean_2017 %>%
-  rename(year = internal_id)
-clean_2017$year <- 2017
-clean_2017 <- clean_2017 %>%
-  select(-110, -111, -112, -113, -114, -115, -116, -117, -118, -119, -120)
-clean_2017 <- clean_2017 %>%
-  rename(going_out = q1_going_out,
-         gender = q2_gender,
-          age = q3_age,
-          country = q4_country,
-          state = q5_state_province_county_etc)
-clean_2017$age[clean_2017$age == "sixty-nine"] <- 69
-clean_2017$age[clean_2017$age == "46 Halloweens"] <- 46
-clean_2017 <- clean_2017 %>%
-  relocate(age, .after = year)
-clean_2017 <- clean_2017 %>%
-  transform(age = as.numeric(age))
-clean_2017 <- clean_2017 %>%
-  mutate(age = na_if(age, 90)) %>%
-  mutate(age = na_if(age, 312)) %>%
-  mutate(age = na_if(age, 99)) %>%
-  mutate(age = na_if(age, 88)) %>%
-  mutate(age = na_if(age, 102)) %>%
-  mutate(age = na_if(age, 100)) %>%
-  mutate(age = na_if(age, 1000))
-clean_2017 <- clean_2017 %>% 
-  rename_with(.cols = starts_with("q6_"), .fn = ~str_replace(.x, "q6_", ""))
-clean_2017 <- clean_2017 %>%
-  mutate(country = na_if(country, 35)) %>%
-  mutate(country = na_if(country, "Earth")) %>%
-  mutate(country = na_if(country, "Europe")) %>%
-  mutate(country = na_if(country, 46)) %>%
-  mutate(country = na_if(country, "insanity lately")) %>%
-  mutate(country = na_if(country, 45)) %>%
-  mutate(country = na_if(country, 32)) %>%
-  mutate(country = na_if(country, "Can")) %>%
-  mutate(country = na_if(country, "Canae")) %>%
-  mutate(country = na_if(country, "Trumpistan")) %>%
-  mutate(country = na_if(country, "New York")) %>%
-  mutate(country = na_if(country, "Endland")) %>%
-  mutate(country = na_if(country, "soviet canuckistan")) %>%
-  mutate(country = na_if(country, 1)) %>%
-  mutate(country = na_if(country, "I don't know anymore")) %>%
-  mutate(country = na_if(country, "subscribe to dm4uz3 on youtube")) %>%
-  mutate(country = na_if(country, "Fear and Loathing")) %>%
-  mutate(country = na_if(country, "cascadia")) %>%
-  mutate(country = na_if(country, "I pretend to be from Canada, but I am really from the United States.")) %>%
-  mutate(country = na_if(country, "Ahem....Amerca")) %>%
-  mutate(country = na_if(country, "UD")) %>%
-  mutate(country = na_if(country, "endland")) %>%
-  mutate(country = na_if(country, "Atlantis")) %>%
-  mutate(country = na_if(country, "N. America")) %>%
-  mutate(country = na_if(country, "Narnia"))
-clean_2017 <- clean_2017 %>%
-  mutate(country = str_replace(country, "^us$|^usa$|^Us$|^US$|^United States of America$|
-                               ^United Staes$|^u.s.a$|^Usa$|^USAUSAUSA$|^america$|
-                               ^U.S.A$|^united states$|^Murica$|^United staes$|
-                               ^United states$|^u.s.a$|^u.s.a.$|^U.S.A.$|
-                               ^united states of america$|^US of A$|
-                               ^united states of america$|^The United States$
-                               |^Unites States$|^Unied States$|^U S$|
-                               ^U.S.$|^North Carolina$|
-                               ^The United States of America$|^USA? Hard to tell anymore..$
-                               |^'merica$|^usas$|^Pittsburgh$|^United State$|^New York$", "USA")) %>%
-  mutate(country = str_replace(country, "^United States$|^unhinged states$|^$
-                               |^The United States of America$|^unite states$
-                               |^U.S.$|^u.s.$|^A$|^United Sates$|^California$
-                               |^USa$|^United Stated$|^New Jersey$
-                               |^unite states$|^United ststes$|^United Statss$
-                               |^murrika$|^USA! USA! USA!$|^USAA$|^Alaska$
-                               |^united States$|^United Statea$|^America$
-                               |^	USA USA USA!!!!$|^California$ ", "USA"))
-clean_2017 <- clean_2017 %>%
-  mutate(country = str_replace(country, "^canada$|^Canada`$|^CANADA$", "Canada")) %>%
-  mutate(country = str_replace(country, "^france$" , "France")) %>%
-  mutate(country = str_replace(country, "^germany$" , "Germany")) %>%
-  mutate(country = str_replace(country, "^finland$", "Finland")) %>%
-  mutate(country = str_replace(country, "^australia$", "Australia")) %>%
-  mutate(country = str_replace(country, "^finland$", "Finland")) %>%
-  mutate(country = str_replace(country, "^The Netherlands$", "Netherlands")) %>%
-  mutate(country = str_replace(country, "^hong kong$", "Hong Kong")) %>%
-  mutate(country = str_replace(country, "^spain$", "Spain"))
-clean_2017 <- clean_2017 %>%
-  mutate(country = str_replace(country, "^England$|^United Kingdom$|^uk$|
-                               ^United Kindom$|^U.K.$|^Uk$|^Scotland$|
-                               ^United kingdom$", "UK"))
-
-
-clean_2015 <- clean_2015 %>%
-  rename("100_grand_bar" = x100_grand_bar,
-  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes = 
-    anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
-  bonkers_the_candy = bonkers,
-  boxo_raisins = box_o_raisins,
-  hersheys_dark_chocolate = dark_chocolate_hershey,
-  hershey_s_milk_chocolate = hersheys_milk_chocolate,
-  licorice_yes_black = licorice,
-  sweetums_a_friend_to_diabetes = sweetums)
-clean_2015 <- clean_2015 %>%
-  add_column(bonkers_the_board_game = NA) %>%
-  add_column(chardonnay = NA) %>%
-  add_column(coffee_crisp = NA) %>%
-  add_column(hersheys_kisses = NA) %>%
-  add_column(mike_and_ike = NA) %>%
-  add_column(blue_m_ms = NA) %>%
-  add_column(red_m_ms = NA) %>%
-  add_column(green_party_m_ms = NA) %>%
-  add_column(independent_m_ms = NA) %>%
-  add_column(abstained_from_m_ming = NA) %>%
-  add_column(mr_goodbar = NA) %>%
-  add_column(peeps = NA) %>%
-  add_column(real_housewives_of_orange_county_season_9_blue_ray = NA) %>%
-  add_column(reeses_pieces = NA) %>%
-  add_column(sandwich_sized_bags_filled_with_boo_berry_crunch = NA) %>%
-  add_column(sourpatch_kids_i_e_abominations_of_nature = NA) %>%
-  add_column(sweet_tarts = NA) %>%
-  add_column(take_5 = NA) %>%
-  add_column(tic_tacs = NA) %>%
-  add_column(whatchamacallit_bars = NA) %>%
-  add_column(dove_bars = NA)
-clean_2016 <- clean_2016 %>%
-  rename("100_grand_bar" = x100_grand_bar,
-         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes =
-           anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
-           hershey_s_milk_chocolate = hersheys_milk_chocolate)
-clean_2016 <- clean_2016 %>%
-  add_column(green_party_m_ms = NA) %>%
-  add_column(independent_m_ms = NA) %>%    
-  add_column(abstained_from_m_ming = NA) %>%    
-  add_column(real_housewives_of_orange_county_season_9_blue_ray = NA) %>%    
-  add_column(sandwich_sized_bags_filled_with_boo_berry_crunch = NA) %>%    
-  add_column(take_5 = NA) %>%
-  add_column(brach_products_not_including_candy_corn = NA) %>%
-  add_column(bubble_gum = NA) %>%
-  add_column(hersheys_kissables = NA) %>%
-  add_column(lapel_pins = NA) %>%
-  add_column(runts = NA) %>%
-  add_column(mint_leaves = NA) %>%
-  add_column(mint_m_ms = NA) %>%
-  add_column(ribbon_candy = NA) %>%
-  add_column(peanut_butter_jars = NA) %>%
-  add_column(peanut_butter_bars = NA) %>%
-  add_column(peterson_brand_sidewalk_chalk = NA)
-
-clean_2017 <- clean_2017 %>%
-  add_column(brach_products_not_including_candy_corn = NA) %>%
-  add_column(bubble_gum = NA) %>%
-  add_column(hersheys_kissables = NA) %>%
-  add_column(lapel_pins = NA) %>%
-  add_column(runts = NA) %>%
-  add_column(mint_leaves = NA) %>%
-  add_column(mint_m_ms = NA) %>%
-  add_column(ribbon_candy = NA) %>%
-  add_column(peanut_butter_jars = NA) %>%
-  add_column(peanut_butter_bars = NA) %>%
-  add_column(peterson_brand_sidewalk_chalk = NA)
-clean_2015 <- clean_2015 %>%
-  add_column(mary_janes = NA) %>%
-  add_column(third_party_m_ms = NA) %>%
-  add_column(person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes = NA)
-clean_2017 <- clean_2017 %>%
-  add_column(mary_janes = NA) %>%
-  add_column(third_party_m_ms = NA) %>%
-  add_column(person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes = NA)
-clean_2015 <- clean_2015 %>%
-  select(year, age, going_out, gender, country, state, "100_grand_bar",
-         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
-         any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
-         bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
-        butterfinger, cadbury_creme_eggs, candy_corn,
-        candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants,
-        caramellos, cash_or_other_forms_of_legal_tender, chardonnay, 
-        chick_o_sticks_we_don_t_know_what_that_is, chiclets, coffee_crisp,
-        creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, 
-        dove_bars, fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,
-        goo_goo_clusters, good_n_plenty, gum_from_baseball_cards,
-        gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
-        hersheys_dark_chocolate, hershey_s_milk_chocolate, hersheys_kisses,
-        hugs_actual_physical_hugs, jolly_rancher_bad_flavor,
-        jolly_ranchers_good_flavor, joy_joy_mit_iodine, junior_mints,
-        senior_mints, kale_smoothie, kinder_happy_hippo, kit_kat, laffy_taffy,
-        lemon_heads, licorice_not_black, licorice_yes_black, lindt_truffle,
-        lollipops, mars, maynards, mike_and_ike, milk_duds, milky_way,
-        regular_m_ms, peanut_m_m_s, blue_m_ms, red_m_ms, green_party_m_ms,
-        independent_m_ms, abstained_from_m_ming, minibags_of_chips, mint_kisses,
-        mint_juleps, mr_goodbar, necco_wafers, nerds, nestle_crunch, nown_laters,
-        peeps, pencils, pixy_stix, real_housewives_of_orange_county_season_9_blue_ray,
-        reese_s_peanut_butter_cups, reeses_pieces, reggie_jackson_bar, rolos,
-        sandwich_sized_bags_filled_with_boo_berry_crunch, skittles,
-        smarties_american, smarties_commonwealth, snickers,
-        sourpatch_kids_i_e_abominations_of_nature, spotted_dick, starburst,
-        sweet_tarts, swedish_fish, sweetums_a_friend_to_diabetes, take_5, tic_tacs,
-        those_odd_marshmallow_circus_peanut_things, three_musketeers,
-        tolberone_something_or_other, trail_mix, twix,
-        vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
-        vicodin, whatchamacallit_bars, white_bread, whole_wheat_anything,
-        york_peppermint_patties, brach_products_not_including_candy_corn,
-        bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
-        mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
-        peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
-        person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes)
-
-clean_2016 <- clean_2016 %>%
-  select(year, age, going_out, gender, country, state, "100_grand_bar",
-         anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
-         any_full_sized_candy_bar, black_jacks ,bonkers_the_candy,
-         bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
-         butterfinger, cadbury_creme_eggs, candy_corn,
-        candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants,
-        caramellos, cash_or_other_forms_of_legal_tender, chardonnay, 
-        chick_o_sticks_we_don_t_know_what_that_is, chiclets, coffee_crisp,
-        creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, 
-        dove_bars, fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,
-        goo_goo_clusters, good_n_plenty, gum_from_baseball_cards,
-        gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
-        hersheys_dark_chocolate, hershey_s_milk_chocolate, hersheys_kisses,
-        hugs_actual_physical_hugs, jolly_rancher_bad_flavor,
-        jolly_ranchers_good_flavor, joy_joy_mit_iodine, junior_mints,
-        senior_mints, kale_smoothie, kinder_happy_hippo, kit_kat, laffy_taffy,
-        lemon_heads, licorice_not_black, licorice_yes_black, lindt_truffle,
-        lollipops, mars, maynards, mike_and_ike, milk_duds, milky_way,
-        regular_m_ms, peanut_m_m_s, blue_m_ms, red_m_ms, green_party_m_ms,
-        independent_m_ms, abstained_from_m_ming, minibags_of_chips, mint_kisses,
-        mint_juleps, mr_goodbar, necco_wafers, nerds, nestle_crunch, nown_laters,
-        peeps, pencils, pixy_stix, real_housewives_of_orange_county_season_9_blue_ray,
-        reese_s_peanut_butter_cups, reeses_pieces, reggie_jackson_bar, rolos,
-        sandwich_sized_bags_filled_with_boo_berry_crunch, skittles,
-        smarties_american, smarties_commonwealth, snickers,
-        sourpatch_kids_i_e_abominations_of_nature, spotted_dick, starburst,
-        sweet_tarts, swedish_fish, sweetums_a_friend_to_diabetes, take_5, tic_tacs,
-        those_odd_marshmallow_circus_peanut_things, three_musketeers,
-        tolberone_something_or_other, trail_mix, twix,
-        vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
-        vicodin, whatchamacallit_bars, white_bread, whole_wheat_anything,
-        york_peppermint_patties, brach_products_not_including_candy_corn,
-        bubble_gum, hersheys_kissables, lapel_pins, runts, mint_leaves,
-        mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
-        peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
-        person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes)
-
+candy_data_clean_joined <- read_csv(here::here("~/GitHub/dirty_data/task_4/dirty_data_codeclan_project_louise/clean_data/joined_candy"))
 
 ```
 
-Joining the dataset
-```{r}
-candy_big <- bind_rows(clean_2015, clean_2016, clean_2017)
+## Analysis and answers to questions
 
-candy_big <- candy_big %>%
-  rename(hundred_grand_bar = "100_grand_bar")
+### What is the total number of candy ratings given across the three years. (Number of candy ratings, not the number of raters. Don’t count missing values)
+```{r}
+describe(candy_data_clean_joined)
 ```
 
-# QUESTIONS
-
-What is the total number of candy ratings given across the three years.
-(Number of candy ratings, not the number of raters. Don’t count missing values)
+### What was the average age of people who are going out trick or treating?
 ```{r}
-describe(candy_big)
-```
-
-What was the average age of people who are going out trick or treating?
-```{r}
-candy_big %>%
+candy_data_clean_joined %>%
   select(age, going_out) %>%
   filter(going_out == "Yes", (!is.na(age))) %>%
   summarise(mean_age = mean(age))
 ```
 
-What was the average age of people who are not going trick or treating?
+### What was the average age of people who are not going trick or treating?
 ```{r}
-candy_big %>%
+candy_data_clean_joined %>%
   select(age, going_out) %>%
   filter(going_out == "No", (!is.na(age))) %>%
   summarise(mean_age = mean(age))
 ```
 
+
+### For each of joy, despair and meh, which candy bar received the most of these ratings?
+
+Rating JOY
 ```{r}
-# Changing the frame to work with numeric values instead
-candy_big_numbers <- candy_big %>%
-  mutate(across(c(hundred_grand_bar,
-                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
-                  any_full_sized_candy_bar, black_jacks,bonkers_the_candy,
-                  bonkers_the_board_game, bottle_caps, boxo_raisins,
-                  broken_glow_stick, butterfinger, cadbury_creme_eggs, candy_corn, 
+joy_rating <- candy_data_clean_joined %>%
+  select(-year, -going_out, -state, -country, -age, -gender) %>%
+  summarise(across(c(hundred_grand_bar,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
+                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  butterfinger, cadbury_creme_eggs, candy_corn, 
                   candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
-                  caramellos, cash_or_other_forms_of_legal_tender,
-                  chardonnay,chick_o_sticks_we_don_t_know_what_that_is, chiclets,
-                  coffee_crisp, creepy_religious_comics_chick_tracts,
-                  dental_paraphenalia, dots, dove_bars, fuzzy_peaches,
-                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
-                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy,
-                  healthy_fruit, heath_bar, hersheys_dark_chocolate,hershey_s_milk_chocolate,
-                  hersheys_kisses,hugs_actual_physical_hugs,jolly_ranchers_good_flavor,
-                  jolly_rancher_bad_flavor,joy_joy_mit_iodine,
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
+                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
+                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
+                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
                   junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
                   kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
-                  licorice_yes_black, lindt_truffle,
-                  lollipops, mars, maynards, mike_and_ike, milk_duds,
-                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
-                  green_party_m_ms, independent_m_ms, abstained_from_m_ming,
-                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
+                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
+                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
                   necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
                   real_housewives_of_orange_county_season_9_blue_ray, 
                   reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
                   sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
                   smarties_american,smarties_commonwealth,snickers,
-                  sourpatch_kids_i_e_abominations_of_nature,
-                  spotted_dick,starburst,sweet_tarts,swedish_fish, 
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
                   sweetums_a_friend_to_diabetes, take_5, tic_tacs,
                   those_odd_marshmallow_circus_peanut_things, three_musketeers,
-                  tolberone_something_or_other, trail_mix,
-                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  twix, vicodin, whatchamacallit_bars, white_bread,
+                  whole_wheat_anything, york_peppermint_patties,
+                  brach_products_not_including_candy_corn, bubble_gum,
+                  hersheys_kissables, lapel_pins, runts, mint_leaves,
+                  mint_m_ms, ribbon_candy, peanut_butter_bars, peanut_butter_jars,
+                  peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
+                  person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes,
+                  nestle_crunch), ~sum(.x == "JOY", na.rm = TRUE)))
+colnames(joy_rating)[max.col(joy_rating,ties.method="first")]
+
+```
+Rating MEH
+```{r}
+meh_rating <- candy_data_clean_joined %>%
+  select(-year, -going_out, -state, -country, -age, -gender) %>%
+  summarise(across(c(hundred_grand_bar,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
+                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  butterfinger, cadbury_creme_eggs, candy_corn, 
+                  candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
+                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
+                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
+                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
+                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
+                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
+                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
+                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
+                  real_housewives_of_orange_county_season_9_blue_ray, 
+                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
+                  smarties_american,smarties_commonwealth,snickers,
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
+                  sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+                  those_odd_marshmallow_circus_peanut_things, three_musketeers,
+                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  twix, vicodin, whatchamacallit_bars, white_bread,
+                  whole_wheat_anything, york_peppermint_patties,
+                  brach_products_not_including_candy_corn, bubble_gum,
+                  hersheys_kissables, lapel_pins, runts, mint_leaves,
+                  mint_m_ms, ribbon_candy, peanut_butter_bars, peanut_butter_jars,
+                  peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
+                  person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes,
+                  nestle_crunch), ~sum(.x == "MEH", na.rm = TRUE)))
+colnames(meh_rating)[max.col(meh_rating,ties.method="first")]
+
+```
+
+Rating DESPAIR
+```{r}
+despair_rating <- candy_data_clean_joined %>%
+  select(-year, -going_out, -state, -country, -age, -gender) %>%
+  summarise(across(c(hundred_grand_bar,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
+                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  butterfinger, cadbury_creme_eggs, candy_corn, 
+                  candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
+                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
+                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
+                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
+                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
+                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
+                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
+                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
+                  real_housewives_of_orange_county_season_9_blue_ray, 
+                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
+                  smarties_american,smarties_commonwealth,snickers,
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
+                  sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+                  those_odd_marshmallow_circus_peanut_things, three_musketeers,
+                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  twix, vicodin, whatchamacallit_bars, white_bread,
+                  whole_wheat_anything, york_peppermint_patties,
+                  brach_products_not_including_candy_corn, bubble_gum,
+                  hersheys_kissables, lapel_pins, runts, mint_leaves,
+                  mint_m_ms, ribbon_candy, peanut_butter_bars, peanut_butter_jars,
+                  peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
+                  person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes,
+                  nestle_crunch), ~sum(.x == "DESPAIR", na.rm = TRUE)))
+colnames(despair_rating)[max.col(despair_rating,ties.method="first")]
+```
+
+
+### How many people rated Starburst as despair?
+```{r}
+candy_data_clean_joined %>%
+  select(starburst)%>%
+  filter(starburst == "DESPAIR") %>%
+  summarise(starburst_sum = sum(n()))
+
+```
+
+### For the next three questions, count despair as -1, joy as +1, and meh as 0.
+
+Adding a variable to answer the following questions with numeric values.
+```{r}
+candy_big_numbers <- candy_data_clean_joined %>%
+  mutate(across(c(hundred_grand_bar,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
+                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  butterfinger, cadbury_creme_eggs, candy_corn, 
+                  candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
+                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
+                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
+                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
+                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
+                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
+                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
+                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
+                  real_housewives_of_orange_county_season_9_blue_ray, 
+                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
+                  smarties_american,smarties_commonwealth,snickers,
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
+                  sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+                  those_odd_marshmallow_circus_peanut_things, three_musketeers,
+                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
                   twix, vicodin, whatchamacallit_bars, white_bread,
                   whole_wheat_anything, york_peppermint_patties,
                   brach_products_not_including_candy_corn, bubble_gum,
@@ -543,115 +237,70 @@ candy_big_numbers <- candy_big %>%
                 ~recode(.x, "JOY" = 1, "MEH" = 0, "DESPAIR" = -1), na.rm = TRUE, as.numeric(.x)))
 ```
 
-For each of joy, despair and meh, which candy bar received the most of these ratings?
+### What was the most popular candy bar by this rating system for each gender in the dataset ?
+
+For female
 ```{r}
-
-
-candy_big %>%
-  select(-year, -going_out, -state, -country, -age, -gender) %>%
-  filter(ifelse(.x = "JOY"), ~!is.na(.x)) %>%
-  summarise(across(sum()))
-
-
-  mutate(across(c(hundred_grand_bar,
-                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
-                  any_full_sized_candy_bar, black_jacks,bonkers_the_candy,
-                  bonkers_the_board_game, bottle_caps, boxo_raisins,
-                  broken_glow_stick, butterfinger, cadbury_creme_eggs, candy_corn, 
-                  candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
-                  caramellos, cash_or_other_forms_of_legal_tender,
-                  chardonnay,chick_o_sticks_we_don_t_know_what_that_is, chiclets,
-                  coffee_crisp, creepy_religious_comics_chick_tracts,
-                  dental_paraphenalia, dots, dove_bars, fuzzy_peaches,
-                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
-                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy,
-                  healthy_fruit, heath_bar, hersheys_dark_chocolate,hershey_s_milk_chocolate,
-                  hersheys_kisses,hugs_actual_physical_hugs,jolly_ranchers_good_flavor,
-                  jolly_rancher_bad_flavor,joy_joy_mit_iodine,
-                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
-                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
-                  licorice_yes_black, lindt_truffle,
-                  lollipops, mars, maynards, mike_and_ike, milk_duds,
-                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
-                  green_party_m_ms, independent_m_ms, abstained_from_m_ming,
-                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
-                  necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
-                  real_housewives_of_orange_county_season_9_blue_ray, 
-                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
-                  sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
-                  smarties_american,smarties_commonwealth,snickers,
-                  sourpatch_kids_i_e_abominations_of_nature,
-                  spotted_dick,starburst,sweet_tarts,swedish_fish, 
-                  sweetums_a_friend_to_diabetes, take_5, tic_tacs,
-                  those_odd_marshmallow_circus_peanut_things, three_musketeers,
-                  tolberone_something_or_other, trail_mix,
-                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
-                  twix, vicodin, whatchamacallit_bars, white_bread,
-                  whole_wheat_anything, york_peppermint_patties,
-                  brach_products_not_including_candy_corn, bubble_gum,
-                  hersheys_kissables, lapel_pins, runts, mint_leaves,
-                  mint_m_ms, ribbon_candy, peanut_butter_bars, peanut_butter_jars,
-                  peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
-                  person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes,
-                  nestle_crunch), count(), (na.rm = TRUE)))
-
-```
-
-How many people rated Starburst as despair?
-```{r}
-candy_big %>%
-  select(starburst)%>%
-  filter(starburst == "DESPAIR") %>%
-  summarise(starburst_sum = sum(n()))
-
-```
-
-For the next three questions, count despair as -1, joy as +1, and meh as 0.
-What was the most popular candy bar by this rating system for each gender in
-the dataset ?
-```{r}
-# for Female
 female_candy_rank <- candy_big_numbers %>%
   select(-year, -going_out, -state, -country, -age) %>%
   filter(gender == "Female") %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
-colnames(female_candy_rank)[max.col(female_candy_rank,ties.method="first")]
+  colnames(female_candy_rank)[max.col(female_candy_rank,ties.method="first")]
 
-# for Male
+```
+
+For male
+```{r}
 male_candy_rank <- candy_big_numbers %>%
   select(-year, -going_out, -state, -country, -age) %>%
   filter(gender == "male") %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
 colnames(male_candy_rank)[max.col(male_candy_rank,ties.method="first")]
-                  
 ```
 
-What was the most popular candy bar in each year?
+### What was the most popular candy bar in each year?
+
+2015
 ```{r}
-# for 2015
-popular_2015 <- candy_big_numbers %>%
-  select(-gender, -going_out, -state, -country, -age) %>%
-  filter(year == 2015) %>%
-  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
-colnames(popular_2015)[max.col(popular_2015,ties.method="first")]
-  
-# for 2016
-popular_2016 <- candy_big_numbers %>%
-  select(-gender, -going_out, -state, -country, -age) %>%
-  filter(year == 2016) %>%
-  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
-colnames(popular_2016)[max.col(popular_2016,ties.method="first")]
+candy_2015_selected <- candy_big_numbers %>%
+  filter(year == 2015)
 
-# for 2017
-candy_big_numbers %>%
-  select(-gender, -going_out, -state, -country, -age) %>%
-  filter(year == 2017) %>%
+popular_2015 <- candy_2015_selected %>%
+  select(-year, -going_out, -state, -country, -age, -gender) %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+
+colnames(popular_2015)[max.col(popular_2015,ties.method="first")]
 
 ```
 
-What was the most popular candy bar by this rating for people in US, Canada,
-UK, and all other countries?
+2016
+```{r}
+candy_2016_selected <- candy_big_numbers %>%
+  filter(year == 2016)
+
+popular_2016 <- candy_2016_selected %>%
+  select(-year, -going_out, -state, -country, -age, -gender) %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+
+colnames(popular_2016)[max.col(popular_2016,ties.method="first")]
+```
+
+2017
+```{r}
+candy_2017_selected <- candy_big_numbers %>%
+  filter(year == 2017)
+
+popular_2017 <- candy_2017_selected %>%
+  select(-year, -going_out, -state, -country, -age, -gender) %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+
+colnames(popular_2017)[max.col(popular_2017,ties.method="first")]
+```
+
+
+### What was the most popular candy bar by this rating for people in US, Canada, UK, and all other countries?
+
+For the USA
 ```{r}
 # for the USA
 popular_USA <- candy_big_numbers %>%
@@ -659,41 +308,38 @@ popular_USA <- candy_big_numbers %>%
   filter(country == "USA") %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
 colnames(popular_USA)[max.col(popular_USA,ties.method="first")]
+```
 
-# for Canada
+For Canada
+```{r}
 popular_canada <- candy_big_numbers %>%
   select(-gender, -going_out, -state, -year, -age) %>%
   filter(country == "Canada") %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
 colnames(popular_canada)[max.col(popular_canada,ties.method="first")]
+```
 
-# for UK
+For the UK
+```{r}
 popular_UK <- candy_big_numbers %>%
   select(-gender, -going_out, -state, -year, -age) %>%
   filter(country == "UK") %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
 colnames(popular_UK)[max.col(popular_UK,ties.method="first")]
+```
 
-# for other countries
+For other countries
+```{r}
 popular_other_countries <- candy_big_numbers %>%
   select(-gender, -going_out, -state, -year, -age) %>%
   filter(country != "Canada", country != "UK", country != "USA") %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
 colnames(popular_other_countries)[max.col(popular_other_countries,ties.method="first")]
-
 ```
 
-Any other interesting analyses or conclusions you come across.
-```{r}
-# Not my analysis, but if I have time, I would like to replicate it:
-# ://boingboing.net/2015/10/31/the-candy-hierarchy-2015-your.html
-# Table 1.B
+### Any other interesting analyses or conclusions you come across.
+The research that the original researchers have done on whether a measure of character has an impact on their candy rating is interesting.
+I find it curious (concering?) that the same result comes out nearly always on top, i.e. "any full sized any candy", however, given the measure of how I assume this data has been captured, people could be ticking this option, whilst also specifying their chosen candy bar, or not.
 
-# EXTENSION
-# Step 7. For the "please leave"/"please List" columns, create a coding matrix,
-# code the data.
-# Step 8. Mints - change all non-numeric data to numeric.
-# Step 9. Betty/Ver - Change all ?? to NA.
-# Step 10. "Check all that apply" - split columns.
-# Step 11. Add NA's to all the "random" columns in the blanks.
-```
+Side-note; I was concerned if my analysis was correct, or wildy off, so I checked the source material. Indeed, any full-sized candy bar ranks on top as of 2019.
+
