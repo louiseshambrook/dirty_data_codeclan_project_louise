@@ -41,11 +41,13 @@ For all 3 datasets:
 - What was the average age of people who are going out trick or treating?
 - What was the average age of people who are not going trick or treating?
 - How many people rated Starburst as despair?
+- For each of joy, despair and meh, which candy bar received the most of these ratings?
+
+For the following questions, a dataframe was ceated where JOY, DESPAIR, and MEH to +1, -1 and 0 were rated as respectively.
 - What was the most popular candy bar by this rating system for each gender in
 the dataset ?
 - What was the most popular candy bar by this rating for people in US, Canada,
 UK, and all other countries?
-- For each of joy, despair and meh, which candy bar received the most of these ratings?
 - What was the most popular candy bar in each year?
 
 ## Other observations
