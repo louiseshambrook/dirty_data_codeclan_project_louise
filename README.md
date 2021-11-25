@@ -50,4 +50,6 @@ UK, and all other countries?
 
 ## Other observations
 - The research that the original researchers have done on whether a measure of character has an impact on their candy rating is interesting.
-- It is interesting to note that the same candy came out on top in my results, for several countries. 
+- I find it curious (concering?) that the same result comes out nearly always on top, i.e. "any full sized any candy", however, given the measure of how I assume this data has been captured, people could be ticking this option, whilst also specifying their chosen candy bar, or not.
+
+- Side-note; I was concerned whether my analysis was correct. Therefore I checked the source material. Indeed, any full-sized candy bar ranks on top as of 2019 which aligns with my results.
