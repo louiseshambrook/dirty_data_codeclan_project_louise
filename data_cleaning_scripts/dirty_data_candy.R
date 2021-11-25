@@ -101,7 +101,7 @@ clean_2015 <- clean_2015 %>%
 # analysis. 
 
 clean_2015 <- clean_2015 %>%
-  rename("100_grand_bar" = x100_grand_bar,
+  rename(hundred_grand_bar= x100_grand_bar,
          anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes = 
            anonymous_brown_globs_that_come_in_black_and_orange_wrappers,
          bonkers_the_candy = bonkers,

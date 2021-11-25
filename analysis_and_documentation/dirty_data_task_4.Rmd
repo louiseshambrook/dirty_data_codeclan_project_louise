@@ -364,10 +364,7 @@ clean_2016 <- clean_2016 %>%
   add_column(peanut_butter_jars = NA) %>%
   add_column(peanut_butter_bars = NA) %>%
   add_column(peterson_brand_sidewalk_chalk = NA)
-clean_2016 <- clean_2016 %>%
-  select(-mary_janes) %>%
-  select(-"third_party_m_ms") %>%
-  select(-"person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes")
+
 clean_2017 <- clean_2017 %>%
   add_column(brach_products_not_including_candy_corn = NA) %>%
   add_column(bubble_gum = NA) %>%
@@ -463,54 +460,149 @@ clean_2016 <- clean_2016 %>%
         mint_m_ms, ribbon_candy, peanut_butter_jars, peanut_butter_bars,
         peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
         person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes)
-names(clean_2017)
+
 
 ```
 
 Joining the dataset
 ```{r}
-joined_candy <- bind_rows(clean_2015, clean_2016, clean_2017)
+candy_big <- bind_rows(clean_2015, clean_2016, clean_2017)
+
+candy_big <- candy_big %>%
+  rename(hundred_grand_bar = "100_grand_bar")
 ```
+
+# QUESTIONS
 
 What is the total number of candy ratings given across the three years.
 (Number of candy ratings, not the number of raters. Don’t count missing values)
 ```{r}
-table(joined_candy$`100_grand_bar`)
-table(joined_candy$`100_grand_bar`)
-
-
+describe(candy_big)
 ```
 
 What was the average age of people who are going out trick or treating?
 ```{r}
-joined_candy %>%
+candy_big %>%
   select(age, going_out) %>%
-  filter(going_out == "Yes") %>%
+  filter(going_out == "Yes", (!is.na(age))) %>%
   summarise(mean_age = mean(age))
-
-# throwing NA - not sure why
 ```
 
 What was the average age of people who are not going trick or treating?
 ```{r}
-joined_candy %>%
+candy_big %>%
   select(age, going_out) %>%
-  filter(going_out == "No") %>%
+  filter(going_out == "No", (!is.na(age))) %>%
   summarise(mean_age = mean(age))
+```
 
+```{r}
+# Changing the frame to work with numeric values instead
+candy_big_numbers <- candy_big %>%
+  mutate(across(c(hundred_grand_bar,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+                  any_full_sized_candy_bar, black_jacks,bonkers_the_candy,
+                  bonkers_the_board_game, bottle_caps, boxo_raisins,
+                  broken_glow_stick, butterfinger, cadbury_creme_eggs, candy_corn, 
+                  candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
+                  caramellos, cash_or_other_forms_of_legal_tender,
+                  chardonnay,chick_o_sticks_we_don_t_know_what_that_is, chiclets,
+                  coffee_crisp, creepy_religious_comics_chick_tracts,
+                  dental_paraphenalia, dots, dove_bars, fuzzy_peaches,
+                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
+                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy,
+                  healthy_fruit, heath_bar, hersheys_dark_chocolate,hershey_s_milk_chocolate,
+                  hersheys_kisses,hugs_actual_physical_hugs,jolly_ranchers_good_flavor,
+                  jolly_rancher_bad_flavor,joy_joy_mit_iodine,
+                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
+                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle,
+                  lollipops, mars, maynards, mike_and_ike, milk_duds,
+                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
+                  green_party_m_ms, independent_m_ms, abstained_from_m_ming,
+                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
+                  real_housewives_of_orange_county_season_9_blue_ray, 
+                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
+                  smarties_american,smarties_commonwealth,snickers,
+                  sourpatch_kids_i_e_abominations_of_nature,
+                  spotted_dick,starburst,sweet_tarts,swedish_fish, 
+                  sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+                  those_odd_marshmallow_circus_peanut_things, three_musketeers,
+                  tolberone_something_or_other, trail_mix,
+                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  twix, vicodin, whatchamacallit_bars, white_bread,
+                  whole_wheat_anything, york_peppermint_patties,
+                  brach_products_not_including_candy_corn, bubble_gum,
+                  hersheys_kissables, lapel_pins, runts, mint_leaves,
+                  mint_m_ms, ribbon_candy, peanut_butter_bars, peanut_butter_jars,
+                  peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
+                  person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes,
+                  nestle_crunch),
+                ~recode(.x, "JOY" = 1, "MEH" = 0, "DESPAIR" = -1), na.rm = TRUE, as.numeric(.x)))
 ```
 
 For each of joy, despair and meh, which candy bar received the most of these ratings?
 ```{r}
 
 
+candy_big %>%
+  select(-year, -going_out, -state, -country, -age, -gender) %>%
+  filter(ifelse(.x = "JOY"), ~!is.na(.x)) %>%
+  summarise(across(sum()))
+
+
+  mutate(across(c(hundred_grand_bar,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+                  any_full_sized_candy_bar, black_jacks,bonkers_the_candy,
+                  bonkers_the_board_game, bottle_caps, boxo_raisins,
+                  broken_glow_stick, butterfinger, cadbury_creme_eggs, candy_corn, 
+                  candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
+                  caramellos, cash_or_other_forms_of_legal_tender,
+                  chardonnay,chick_o_sticks_we_don_t_know_what_that_is, chiclets,
+                  coffee_crisp, creepy_religious_comics_chick_tracts,
+                  dental_paraphenalia, dots, dove_bars, fuzzy_peaches,
+                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
+                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy,
+                  healthy_fruit, heath_bar, hersheys_dark_chocolate,hershey_s_milk_chocolate,
+                  hersheys_kisses,hugs_actual_physical_hugs,jolly_ranchers_good_flavor,
+                  jolly_rancher_bad_flavor,joy_joy_mit_iodine,
+                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
+                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle,
+                  lollipops, mars, maynards, mike_and_ike, milk_duds,
+                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
+                  green_party_m_ms, independent_m_ms, abstained_from_m_ming,
+                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
+                  real_housewives_of_orange_county_season_9_blue_ray, 
+                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
+                  smarties_american,smarties_commonwealth,snickers,
+                  sourpatch_kids_i_e_abominations_of_nature,
+                  spotted_dick,starburst,sweet_tarts,swedish_fish, 
+                  sweetums_a_friend_to_diabetes, take_5, tic_tacs,
+                  those_odd_marshmallow_circus_peanut_things, three_musketeers,
+                  tolberone_something_or_other, trail_mix,
+                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  twix, vicodin, whatchamacallit_bars, white_bread,
+                  whole_wheat_anything, york_peppermint_patties,
+                  brach_products_not_including_candy_corn, bubble_gum,
+                  hersheys_kissables, lapel_pins, runts, mint_leaves,
+                  mint_m_ms, ribbon_candy, peanut_butter_bars, peanut_butter_jars,
+                  peterson_brand_sidewalk_chalk, mary_janes, third_party_m_ms,
+                  person_of_interest_season_3_dvd_box_set_not_including_disc_4_with_hilarious_outtakes,
+                  nestle_crunch), count(), (na.rm = TRUE)))
+
 ```
 
 How many people rated Starburst as despair?
 ```{r}
-joined_candy %>%
-  select(starburst, year) %>%
-  filter(starbust == "DESPAIR")
+candy_big %>%
+  select(starburst)%>%
+  filter(starburst == "DESPAIR") %>%
+  summarise(starburst_sum = sum(n()))
 
 ```
 
@@ -518,24 +610,76 @@ For the next three questions, count despair as -1, joy as +1, and meh as 0.
 What was the most popular candy bar by this rating system for each gender in
 the dataset ?
 ```{r}
+# for Female
+female_candy_rank <- candy_big_numbers %>%
+  select(-year, -going_out, -state, -country, -age) %>%
+  filter(gender == "Female") %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(female_candy_rank)[max.col(female_candy_rank,ties.method="first")]
 
-
-
-filter(f)
-group_by(across(all(joy)))
-summarise(sum(n))
-
+# for Male
+male_candy_rank <- candy_big_numbers %>%
+  select(-year, -going_out, -state, -country, -age) %>%
+  filter(gender == "male") %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(male_candy_rank)[max.col(male_candy_rank,ties.method="first")]
+                  
 ```
 
 What was the most popular candy bar in each year?
 ```{r}
+# for 2015
+popular_2015 <- candy_big_numbers %>%
+  select(-gender, -going_out, -state, -country, -age) %>%
+  filter(year == 2015) %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(popular_2015)[max.col(popular_2015,ties.method="first")]
+  
+# for 2016
+popular_2016 <- candy_big_numbers %>%
+  select(-gender, -going_out, -state, -country, -age) %>%
+  filter(year == 2016) %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(popular_2016)[max.col(popular_2016,ties.method="first")]
+
+# for 2017
+candy_big_numbers %>%
+  select(-gender, -going_out, -state, -country, -age) %>%
+  filter(year == 2017) %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
 
 ```
 
 What was the most popular candy bar by this rating for people in US, Canada,
 UK, and all other countries?
 ```{r}
+# for the USA
+popular_USA <- candy_big_numbers %>%
+  select(-gender, -going_out, -state, -year, -age) %>%
+  filter(country == "USA") %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(popular_USA)[max.col(popular_USA,ties.method="first")]
 
+# for Canada
+popular_canada <- candy_big_numbers %>%
+  select(-gender, -going_out, -state, -year, -age) %>%
+  filter(country == "Canada") %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(popular_canada)[max.col(popular_canada,ties.method="first")]
+
+# for UK
+popular_UK <- candy_big_numbers %>%
+  select(-gender, -going_out, -state, -year, -age) %>%
+  filter(country == "UK") %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(popular_UK)[max.col(popular_UK,ties.method="first")]
+
+# for other countries
+popular_other_countries <- candy_big_numbers %>%
+  select(-gender, -going_out, -state, -year, -age) %>%
+  filter(country != "Canada", country != "UK", country != "USA") %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)))
+colnames(popular_other_countries)[max.col(popular_other_countries,ties.method="first")]
 
 ```
 
