@@ -35,12 +35,7 @@ For all 3 datasets:
 
 - For some of the analysis questions, the dataframe has been manipulated to change JOY, DESPAIR, and MEH to +1, -1 and 0 respectively.
 
-## Analysis answers.
-The following questions are outstanding:
-- For each of joy, despair and meh, which candy bar received the most of these ratings?
-- What was the most popular candy bar in each year?
-
-The below questions have been answered:
+## Analysis answers
 - What is the total number of candy ratings given across the three years.
 (Number of candy ratings, not the number of raters. Don’t count missing values)
 - What was the average age of people who are going out trick or treating?
@@ -50,7 +45,9 @@ The below questions have been answered:
 the dataset ?
 - What was the most popular candy bar by this rating for people in US, Canada,
 UK, and all other countries?
+- For each of joy, despair and meh, which candy bar received the most of these ratings?
+- What was the most popular candy bar in each year?
 
-## Other observations.
+## Other observations
 - The research that the original researchers have done on whether a measure of character has an impact on their candy rating is interesting.
 - It is interesting to note that the same candy came out on top in my results, for several countries. 
