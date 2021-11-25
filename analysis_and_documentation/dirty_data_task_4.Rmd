@@ -1,9 +1,9 @@
 ---
-title: "R Notebook"
+title: "Dirty Data - Halloween Candy"
 output: html_notebook
 ---
-# Dirty Data - Louise Shambrook
-## 26/11/2021
+### Louise Shambrook
+### 26/11/2021
 
 ### Brief Introduction to the dataset
 This dataset is based on data from David Ng and Ben Cohen. They have previously ranked candy based on their location in geological strata, for trick or treating purposes. As of 2019, this has become a way of measuring "net feelies" when trick or treating, for a wide range of candies, which critically includes items such as hugs, glow sticks and bread. Source: https://boingboing.net/author/davidng2
@@ -15,6 +15,9 @@ This dataset is based on data from David Ng and Ben Cohen. They have previously 
 - I assumed that respondents will generally only be from the US and Canada.
 - I assumed that age will only be given in whole numbers.
 - I assumed that the joined table did not / could not be pivoted, due to the large amount of data collected.
+
+Note a key assumption:
+A key focus of the cleaning process has been to retain as much data as possible, with the assumption that in the analysis it will then be possible to filter irrelvant factors (e.g. year, when) this is not pertinent to the question at hand). Therefore, for all questions/answers, it should be assumed that no data has been removed, and where some has been removed, it is judged that this should not have an impact on the final outcome.
 
 ### Steps to clean the data
 - Using janitor to clean the column names.
@@ -31,19 +34,33 @@ This dataset is based on data from David Ng and Ben Cohen. They have previously 
 - Saving to csv.
 - For some of the analysis questions, the dataframe has been manipulated to change JOY, DESPAIR, and MEH to +1, -1 and 0 respectively.
 
-## Reading in the cleaned data
 ```{r}
-# reading in cleaned data
+# reading in cleaned data and calling required libraries
 
-candy_data_clean_joined <- read_csv(here::here("~/GitHub/dirty_data/task_4/dirty_data_codeclan_project_louise/clean_data/joined_candy"))
+candy_data_clean_joined <- read_csv(
+  here::here("~/GitHub/dirty_data/task_4/dirty_data_codeclan_project_louise/clean_data/joined_candy"))
 
+library(readr)
+library(readxl)
+library(dplyr)
+library(here)
+library(janitor)
+library(stringr)
+library(tidyverse)
+library(assertr)
 ```
 
-## Analysis and answers to questions
+### Analysis and answers to questions
 
-### What is the total number of candy ratings given across the three years. (Number of candy ratings, not the number of raters. Don’t count missing values)
+
+### What is the total number of candy ratings given across the three years?
 ```{r}
-describe(candy_data_clean_joined)
+total_rating <- function(cheese, banana, cake) {
+  rowSums(cheese) + rowSums(banana) + rowSums(cake)
+}
+
+total_rating(joy_rating, meh_rating, despair_rating)
+
 ```
 
 ### What was the average age of people who are going out trick or treating?
@@ -62,38 +79,48 @@ candy_data_clean_joined %>%
   summarise(mean_age = mean(age))
 ```
 
-
 ### For each of joy, despair and meh, which candy bar received the most of these ratings?
 
-Rating JOY
+
+### joy
 ```{r}
 joy_rating <- candy_data_clean_joined %>%
   select(-year, -going_out, -state, -country, -age, -gender) %>%
   summarise(across(c(hundred_grand_bar,
-                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
-                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+                  any_full_sized_candy_bar,black_jacks,bonkers_the_candy,
+                  bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
                   butterfinger, cadbury_creme_eggs, candy_corn, 
                   candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
-                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
-                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
-                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
-                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
-                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
-                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
-                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
-                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
-                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
-                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
-                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,
+                  chick_o_sticks_we_don_t_know_what_that_is,chiclets,
+                  coffee_crisp, creepy_religious_comics_chick_tracts,
+                  dental_paraphenalia, dots, dove_bars,fuzzy_peaches,
+                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters,
+                  good_n_plenty,gum_from_baseball_cards,
+                  gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate,
+                  hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,
+                  joy_joy_mit_iodine,junior_mints,senior_mints,kale_smoothie,
+                  kinder_happy_hippo,kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle, lollipops, mars,
+                  maynards, mike_and_ike, milk_duds,milky_way,
+                  regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
+                  green_party_m_ms, independent_m_ms,abstained_from_m_ming,
+                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
                   necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
                   real_housewives_of_orange_county_season_9_blue_ray, 
-                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  reese_s_peanut_butter_cups,reeses_pieces,
+                  reggie_jackson_bar,rolos,
                   sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
                   smarties_american,smarties_commonwealth,snickers,
-                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,
+                  starburst,sweet_tarts,swedish_fish,
                   sweetums_a_friend_to_diabetes, take_5, tic_tacs,
                   those_odd_marshmallow_circus_peanut_things, three_musketeers,
-                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  tolberone_something_or_other, trail_mix,
+                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
                   twix, vicodin, whatchamacallit_bars, white_bread,
                   whole_wheat_anything, york_peppermint_patties,
                   brach_products_not_including_candy_corn, bubble_gum,
@@ -105,35 +132,47 @@ joy_rating <- candy_data_clean_joined %>%
 colnames(joy_rating)[max.col(joy_rating,ties.method="first")]
 
 ```
-Rating MEH
+
+
+### meh
 ```{r}
 meh_rating <- candy_data_clean_joined %>%
   select(-year, -going_out, -state, -country, -age, -gender) %>%
   summarise(across(c(hundred_grand_bar,
-                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
-                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+                  any_full_sized_candy_bar,black_jacks,bonkers_the_candy,
+                  bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
                   butterfinger, cadbury_creme_eggs, candy_corn, 
                   candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
-                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
-                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
-                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
-                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
-                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
-                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
-                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
-                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
-                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
-                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
-                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,
+                  chick_o_sticks_we_don_t_know_what_that_is,chiclets,
+                  coffee_crisp, creepy_religious_comics_chick_tracts,
+                  dental_paraphenalia, dots, dove_bars,fuzzy_peaches,
+                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters,
+                  good_n_plenty,gum_from_baseball_cards,
+                  gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate,
+                  hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,
+                  joy_joy_mit_iodine,junior_mints,senior_mints,kale_smoothie,
+                  kinder_happy_hippo,kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle, lollipops, mars,
+                  maynards, mike_and_ike, milk_duds,milky_way,
+                  regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
+                  green_party_m_ms, independent_m_ms,abstained_from_m_ming,
+                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
                   necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
                   real_housewives_of_orange_county_season_9_blue_ray, 
-                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  reese_s_peanut_butter_cups,reeses_pieces,
+                  reggie_jackson_bar,rolos,
                   sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
                   smarties_american,smarties_commonwealth,snickers,
-                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,
+                  starburst,sweet_tarts,swedish_fish,
                   sweetums_a_friend_to_diabetes, take_5, tic_tacs,
                   those_odd_marshmallow_circus_peanut_things, three_musketeers,
-                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  tolberone_something_or_other, trail_mix,
+                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
                   twix, vicodin, whatchamacallit_bars, white_bread,
                   whole_wheat_anything, york_peppermint_patties,
                   brach_products_not_including_candy_corn, bubble_gum,
@@ -146,35 +185,45 @@ colnames(meh_rating)[max.col(meh_rating,ties.method="first")]
 
 ```
 
-Rating DESPAIR
+### despair
 ```{r}
 despair_rating <- candy_data_clean_joined %>%
   select(-year, -going_out, -state, -country, -age, -gender) %>%
   summarise(across(c(hundred_grand_bar,
-                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
-                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+                  any_full_sized_candy_bar,black_jacks,bonkers_the_candy,
+                  bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
                   butterfinger, cadbury_creme_eggs, candy_corn, 
                   candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
-                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
-                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
-                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
-                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
-                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
-                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
-                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
-                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
-                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
-                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
-                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,
+                  chick_o_sticks_we_don_t_know_what_that_is,chiclets,
+                  coffee_crisp, creepy_religious_comics_chick_tracts,
+                  dental_paraphenalia, dots, dove_bars,fuzzy_peaches,
+                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters,
+                  good_n_plenty,gum_from_baseball_cards,
+                  gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate,
+                  hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,
+                  joy_joy_mit_iodine,junior_mints,senior_mints,kale_smoothie,
+                  kinder_happy_hippo,kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle, lollipops, mars,
+                  maynards, mike_and_ike, milk_duds,milky_way,
+                  regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
+                  green_party_m_ms, independent_m_ms,abstained_from_m_ming,
+                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
                   necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
                   real_housewives_of_orange_county_season_9_blue_ray, 
-                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  reese_s_peanut_butter_cups,reeses_pieces,
+                  reggie_jackson_bar,rolos,
                   sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
                   smarties_american,smarties_commonwealth,snickers,
-                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,
+                  starburst,sweet_tarts,swedish_fish,
                   sweetums_a_friend_to_diabetes, take_5, tic_tacs,
                   those_odd_marshmallow_circus_peanut_things, three_musketeers,
-                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  tolberone_something_or_other, trail_mix,
+                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
                   twix, vicodin, whatchamacallit_bars, white_bread,
                   whole_wheat_anything, york_peppermint_patties,
                   brach_products_not_including_candy_corn, bubble_gum,
@@ -196,36 +245,45 @@ candy_data_clean_joined %>%
 
 ```
 
-### For the next three questions, count despair as -1, joy as +1, and meh as 0.
-
-Adding a variable to answer the following questions with numeric values.
+For the next three questions, count despair as -1, joy as +1, and meh as 0.
 ```{r}
+#Adding a variable to answer the following questions with numeric values.
 candy_big_numbers <- candy_data_clean_joined %>%
   mutate(across(c(hundred_grand_bar,
-                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes, any_full_sized_candy_bar,
-                  black_jacks,bonkers_the_candy, bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
+                  anonymous_brown_globs_that_come_in_black_and_orange_wrappers_a_k_a_mary_janes,
+                  any_full_sized_candy_bar,black_jacks,bonkers_the_candy,
+                  bonkers_the_board_game, bottle_caps, boxo_raisins, broken_glow_stick,
                   butterfinger, cadbury_creme_eggs, candy_corn, 
                   candy_that_is_clearly_just_the_stuff_given_out_for_free_at_restaurants, 
-                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,chick_o_sticks_we_don_t_know_what_that_is,
-                  chiclets,coffee_crisp, creepy_religious_comics_chick_tracts, dental_paraphenalia, dots, dove_bars,
-                  fuzzy_peaches, generic_brand_acetaminophen, glow_sticks,goo_goo_clusters, good_n_plenty,
-                  gum_from_baseball_cards, gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
-                  hersheys_dark_chocolate,hershey_s_milk_chocolate, hersheys_kisses,hugs_actual_physical_hugs,
-                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,joy_joy_mit_iodine,
-                  junior_mints,senior_mints,kale_smoothie,kinder_happy_hippo ,
-                  kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
-                  licorice_yes_black, lindt_truffle, lollipops, mars, maynards, mike_and_ike, milk_duds,
-                  milky_way,regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms, green_party_m_ms, independent_m_ms,
-                  abstained_from_m_ming, minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
+                  caramellos, cash_or_other_forms_of_legal_tender, chardonnay,
+                  chick_o_sticks_we_don_t_know_what_that_is,chiclets,
+                  coffee_crisp, creepy_religious_comics_chick_tracts,
+                  dental_paraphenalia, dots, dove_bars,fuzzy_peaches,
+                  generic_brand_acetaminophen, glow_sticks,goo_goo_clusters,
+                  good_n_plenty,gum_from_baseball_cards,
+                  gummy_bears_straight_up, hard_candy, healthy_fruit, heath_bar,
+                  hersheys_dark_chocolate,hershey_s_milk_chocolate,
+                  hersheys_kisses,hugs_actual_physical_hugs,
+                  jolly_ranchers_good_flavor, jolly_rancher_bad_flavor,
+                  joy_joy_mit_iodine,junior_mints,senior_mints,kale_smoothie,
+                  kinder_happy_hippo,kit_kat, laffy_taffy,lemon_heads, licorice_not_black,
+                  licorice_yes_black, lindt_truffle, lollipops, mars,
+                  maynards, mike_and_ike, milk_duds,milky_way,
+                  regular_m_ms,peanut_m_m_s, blue_m_ms,red_m_ms,
+                  green_party_m_ms, independent_m_ms,abstained_from_m_ming,
+                  minibags_of_chips, mint_kisses, mint_juleps, mr_goodbar,
                   necco_wafers, nerds, nown_laters, peeps, pencils,pixy_stix,
                   real_housewives_of_orange_county_season_9_blue_ray, 
-                  reese_s_peanut_butter_cups,reeses_pieces, reggie_jackson_bar,rolos,
+                  reese_s_peanut_butter_cups,reeses_pieces,
+                  reggie_jackson_bar,rolos,
                   sandwich_sized_bags_filled_with_boo_berry_crunch,skittles,
                   smarties_american,smarties_commonwealth,snickers,
-                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,starburst,sweet_tarts,swedish_fish,
+                  sourpatch_kids_i_e_abominations_of_nature,spotted_dick,
+                  starburst,sweet_tarts,swedish_fish,
                   sweetums_a_friend_to_diabetes, take_5, tic_tacs,
                   those_odd_marshmallow_circus_peanut_things, three_musketeers,
-                  tolberone_something_or_other, trail_mix, vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
+                  tolberone_something_or_other, trail_mix,
+                  vials_of_pure_high_fructose_corn_syrup_for_main_lining_into_your_vein,
                   twix, vicodin, whatchamacallit_bars, white_bread,
                   whole_wheat_anything, york_peppermint_patties,
                   brach_products_not_including_candy_corn, bubble_gum,
@@ -239,7 +297,7 @@ candy_big_numbers <- candy_data_clean_joined %>%
 
 ### What was the most popular candy bar by this rating system for each gender in the dataset ?
 
-For female
+### female
 ```{r}
 female_candy_rank <- candy_big_numbers %>%
   select(-year, -going_out, -state, -country, -age) %>%
@@ -249,7 +307,7 @@ female_candy_rank <- candy_big_numbers %>%
 
 ```
 
-For male
+### male
 ```{r}
 male_candy_rank <- candy_big_numbers %>%
   select(-year, -going_out, -state, -country, -age) %>%
@@ -260,7 +318,7 @@ colnames(male_candy_rank)[max.col(male_candy_rank,ties.method="first")]
 
 ### What was the most popular candy bar in each year?
 
-2015
+### 2015
 ```{r}
 candy_2015_selected <- candy_big_numbers %>%
   filter(year == 2015)
@@ -273,7 +331,7 @@ colnames(popular_2015)[max.col(popular_2015,ties.method="first")]
 
 ```
 
-2016
+### 2016
 ```{r}
 candy_2016_selected <- candy_big_numbers %>%
   filter(year == 2016)
@@ -285,7 +343,7 @@ popular_2016 <- candy_2016_selected %>%
 colnames(popular_2016)[max.col(popular_2016,ties.method="first")]
 ```
 
-2017
+### 2017
 ```{r}
 candy_2017_selected <- candy_big_numbers %>%
   filter(year == 2017)
@@ -300,7 +358,13 @@ colnames(popular_2017)[max.col(popular_2017,ties.method="first")]
 
 ### What was the most popular candy bar by this rating for people in US, Canada, UK, and all other countries?
 
-For the USA
+Note - during the data cleaning process, it was not possible to correct every 
+answer for the US, UK and Canada, respectively. There were about 10-15 responses
+which remained dirty, and this could therefore skew the answers.
+There were also some countries under "other" which were not cleaned; the dirty
+quantity is also around 10-15 which could also impact the results.
+
+### US
 ```{r}
 # for the USA
 popular_USA <- candy_big_numbers %>%
@@ -310,7 +374,7 @@ popular_USA <- candy_big_numbers %>%
 colnames(popular_USA)[max.col(popular_USA,ties.method="first")]
 ```
 
-For Canada
+### Canada
 ```{r}
 popular_canada <- candy_big_numbers %>%
   select(-gender, -going_out, -state, -year, -age) %>%
@@ -319,7 +383,7 @@ popular_canada <- candy_big_numbers %>%
 colnames(popular_canada)[max.col(popular_canada,ties.method="first")]
 ```
 
-For the UK
+### UK
 ```{r}
 popular_UK <- candy_big_numbers %>%
   select(-gender, -going_out, -state, -year, -age) %>%
@@ -328,7 +392,7 @@ popular_UK <- candy_big_numbers %>%
 colnames(popular_UK)[max.col(popular_UK,ties.method="first")]
 ```
 
-For other countries
+### other countries
 ```{r}
 popular_other_countries <- candy_big_numbers %>%
   select(-gender, -going_out, -state, -year, -age) %>%
@@ -341,5 +405,5 @@ colnames(popular_other_countries)[max.col(popular_other_countries,ties.method="f
 The research that the original researchers have done on whether a measure of character has an impact on their candy rating is interesting.
 I find it curious (concering?) that the same result comes out nearly always on top, i.e. "any full sized any candy", however, given the measure of how I assume this data has been captured, people could be ticking this option, whilst also specifying their chosen candy bar, or not.
 
-Side-note; I was concerned if my analysis was correct, or wildy off, so I checked the source material. Indeed, any full-sized candy bar ranks on top as of 2019.
+Side-note; I was concerned whether my analysis was correct. Therefore I checked the source material. Indeed, any full-sized candy bar ranks on top as of 2019 which aligns with my results.
 

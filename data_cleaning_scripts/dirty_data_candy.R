@@ -9,7 +9,6 @@ library(janitor)
 library(stringr)
 library(tidyverse)
 library(assertr)
-library(Hmisc)
 
 # Loading datasets ---------------------------
 candy_2015 <- read_xlsx(here::here("raw_data/boing-boing-candy-2015.xlsx"))
